@@ -13,6 +13,8 @@ Prérequis : Node 22+, Docker (pour Supabase local).
 
 ```bash
 npm install
+./scripts/dev-env.sh --app    # Docker, Supabase et Next.js (idempotent)
+# ou, étape par étape :
 npm run db:start              # démarre Postgres/Auth/Realtime en local
 cp .env.example .env.local    # puis renseigner les clés affichées par `npx supabase status`
 npm run dev

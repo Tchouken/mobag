@@ -146,7 +146,7 @@ reset role;
 select pg_temp.login('00000000-0000-0000-0000-0000000000a2');
 select is(public.set_assembly_status(current_setting('test.sa')::uuid, 'convened', null), 4, 'brouillon → convoquée (les clés ne changent pas la version de l''AG)');
 select throws_ok(format($$ select public.set_assembly_status(%L, 'in_session') $$, current_setting('test.sa')),
-  'P0001', 'transition_not_available', 'le passage en séance n''est pas encore disponible (T6)');
+  'P0001', 'no_members', 'pas de passage en séance sans participants');
 select throws_ok(format($$ select public.set_assembly_status(%L, 'archived') $$, current_setting('test.asso')),
   'P0001', 'transition_not_available', 'transition interdite : brouillon → archivée');
 select lives_ok(format($$ select public.set_assembly_status(%L, 'draft', 'Erreur de date') $$, current_setting('test.sa')),

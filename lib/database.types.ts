@@ -105,6 +105,13 @@ export type Database = {
             referencedRelation: "organizations";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "assemblies_president_fk";
+            columns: ["president_attendee_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
         ];
       };
       assembly_staff: {
@@ -139,6 +146,136 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      attendance_events: {
+        Row: {
+          assembly_id: string;
+          at: string;
+          attendee_id: string;
+          by_user_id: string | null;
+          id: number;
+          mode: string | null;
+          payload: NonNullable<Json>;
+          type: string;
+        };
+        Insert: {
+          assembly_id: string;
+          at?: string;
+          attendee_id: string;
+          by_user_id?: string | null;
+          id?: never;
+          mode?: string | null;
+          payload?: NonNullable<Json>;
+          type: string;
+        };
+        Update: {
+          assembly_id?: string;
+          at?: string;
+          attendee_id?: string;
+          by_user_id?: string | null;
+          id?: never;
+          mode?: string | null;
+          payload?: NonNullable<Json>;
+          type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendance_events_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      attendee_members: {
+        Row: {
+          assembly_id: string;
+          attendee_id: string;
+          member_id: string;
+        };
+        Insert: {
+          assembly_id: string;
+          attendee_id: string;
+          member_id: string;
+        };
+        Update: {
+          assembly_id?: string;
+          attendee_id?: string;
+          member_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendee_members_attendee_id_assembly_id_fkey";
+            columns: ["attendee_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "attendee_members_member_id_assembly_id_fkey";
+            columns: ["member_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
+      attendees: {
+        Row: {
+          assembly_id: string;
+          checked_in_at: string | null;
+          checked_out_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          email: string | null;
+          full_name: string;
+          id: string;
+          is_proxy_ineligible: boolean;
+          phone: string | null;
+          signature_path: string | null;
+          status: Database["public"]["Enums"]["attendee_status"];
+          version: number;
+        };
+        Insert: {
+          assembly_id: string;
+          checked_in_at?: string | null;
+          checked_out_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          full_name: string;
+          id?: string;
+          is_proxy_ineligible?: boolean;
+          phone?: string | null;
+          signature_path?: string | null;
+          status?: Database["public"]["Enums"]["attendee_status"];
+          version?: number;
+        };
+        Update: {
+          assembly_id?: string;
+          checked_in_at?: string | null;
+          checked_out_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          full_name?: string;
+          id?: string;
+          is_proxy_ineligible?: boolean;
+          phone?: string | null;
+          signature_path?: string | null;
+          status?: Database["public"]["Enums"]["attendee_status"];
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "attendees_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
             referencedColumns: ["id"];
           },
         ];
@@ -217,6 +354,58 @@ export type Database = {
             columns: ["org_id"];
             isOneToOne: false;
             referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      member_presence: {
+        Row: {
+          assembly_id: string;
+          holder_attendee_id: string | null;
+          member_id: string;
+          since: string;
+          status: Database["public"]["Enums"]["presence_status"];
+          version: number;
+          via_proxy_id: string | null;
+        };
+        Insert: {
+          assembly_id: string;
+          holder_attendee_id?: string | null;
+          member_id: string;
+          since?: string;
+          status: Database["public"]["Enums"]["presence_status"];
+          version?: number;
+          via_proxy_id?: string | null;
+        };
+        Update: {
+          assembly_id?: string;
+          holder_attendee_id?: string | null;
+          member_id?: string;
+          since?: string;
+          status?: Database["public"]["Enums"]["presence_status"];
+          version?: number;
+          via_proxy_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "member_presence_holder_attendee_id_assembly_id_fkey";
+            columns: ["holder_attendee_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "member_presence_member_id_assembly_id_fkey";
+            columns: ["member_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "member_presence_via_proxy_id_fkey";
+            columns: ["via_proxy_id"];
+            isOneToOne: false;
+            referencedRelation: "proxies";
             referencedColumns: ["id"];
           },
         ];
@@ -507,6 +696,95 @@ export type Database = {
           id?: string;
         };
         Relationships: [];
+      };
+      proxies: {
+        Row: {
+          assembly_id: string;
+          created_at: string;
+          created_by: string | null;
+          derogation_by: string | null;
+          derogation_reason: string | null;
+          document_path: string | null;
+          grantor_member_id: string;
+          holder_attendee_id: string | null;
+          id: string;
+          parent_proxy_id: string | null;
+          return_expected: boolean;
+          revoked_at: string | null;
+          revoked_by: string | null;
+          revoked_kind: string | null;
+          revoked_reason: string | null;
+          status: Database["public"]["Enums"]["proxy_status"];
+          type: Database["public"]["Enums"]["proxy_type"];
+        };
+        Insert: {
+          assembly_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          derogation_by?: string | null;
+          derogation_reason?: string | null;
+          document_path?: string | null;
+          grantor_member_id: string;
+          holder_attendee_id?: string | null;
+          id?: string;
+          parent_proxy_id?: string | null;
+          return_expected?: boolean;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          revoked_kind?: string | null;
+          revoked_reason?: string | null;
+          status: Database["public"]["Enums"]["proxy_status"];
+          type: Database["public"]["Enums"]["proxy_type"];
+        };
+        Update: {
+          assembly_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          derogation_by?: string | null;
+          derogation_reason?: string | null;
+          document_path?: string | null;
+          grantor_member_id?: string;
+          holder_attendee_id?: string | null;
+          id?: string;
+          parent_proxy_id?: string | null;
+          return_expected?: boolean;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          revoked_kind?: string | null;
+          revoked_reason?: string | null;
+          status?: Database["public"]["Enums"]["proxy_status"];
+          type?: Database["public"]["Enums"]["proxy_type"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "proxies_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "proxies_grantor_member_id_assembly_id_fkey";
+            columns: ["grantor_member_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "proxies_holder_attendee_id_assembly_id_fkey";
+            columns: ["holder_attendee_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "proxies_parent_proxy_id_fkey";
+            columns: ["parent_proxy_id"];
+            isOneToOne: false;
+            referencedRelation: "proxies";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       resolution_attachments: {
         Row: {
@@ -812,6 +1090,27 @@ export type Database = {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
         Returns: undefined;
       };
+      attendee_portfolio: { Args: { p_attendee: string }; Returns: Json };
+      check_in: {
+        Args: {
+          p_assembly: string;
+          p_attendee: string;
+          p_expected_version?: number;
+          p_new_attendee?: Json;
+          p_signature_path?: string;
+        };
+        Returns: Json;
+      };
+      check_out: {
+        Args: {
+          p_attendee: string;
+          p_derogation_reason?: string;
+          p_expected_version?: number;
+          p_mode: string;
+          p_transfer_to?: string;
+        };
+        Returns: Json;
+      };
       create_assembly: {
         Args: {
           p_legal_family: string;
@@ -826,10 +1125,22 @@ export type Database = {
         Returns: string;
       };
       create_organization: { Args: { p_name: string; p_slug: string }; Returns: string };
+      current_quorum: { Args: { p_assembly: string; p_weight_key?: string }; Returns: Json };
       delete_member: { Args: { p_member: string }; Returns: undefined };
       delete_resolution: { Args: { p_reason?: string; p_resolution: string }; Returns: undefined };
       delete_weight_key: { Args: { p_key: string }; Returns: undefined };
       get_org_invitation: { Args: { p_token: string }; Returns: Json };
+      grant_proxy: {
+        Args: {
+          p_assembly: string;
+          p_derogation_reason?: string;
+          p_document_path?: string;
+          p_grantor: string;
+          p_holder: string;
+          p_type: Database["public"]["Enums"]["proxy_type"];
+        };
+        Returns: string;
+      };
       import_members: {
         Args: { p_assembly: string; p_dry_run: boolean; p_mode: string; p_rows: Json; p_source?: Json };
         Returns: Json;
@@ -853,7 +1164,9 @@ export type Database = {
         Args: { p_assembly: string; p_ordered_ids: string[]; p_parent: string };
         Returns: undefined;
       };
+      return_attendee: { Args: { p_attendee: string; p_expected_version?: number }; Returns: Json };
       revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
+      revoke_proxy: { Args: { p_proxy: string; p_reason?: string }; Returns: undefined };
       set_assembly_status: {
         Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
         Returns: number;
@@ -862,6 +1175,7 @@ export type Database = {
         Args: { p_org: string; p_role: Database["public"]["Enums"]["org_role"]; p_user: string };
         Returns: undefined;
       };
+      set_president: { Args: { p_assembly: string; p_attendee: string }; Returns: Json };
       update_assembly_info: {
         Args: {
           p_assembly: string;
@@ -885,6 +1199,19 @@ export type Database = {
           p_settings: Json;
         };
         Returns: number;
+      };
+      upsert_attendee: {
+        Args: {
+          p_assembly: string;
+          p_attendee: string;
+          p_email: string;
+          p_expected_version?: number;
+          p_full_name: string;
+          p_is_proxy_ineligible: boolean;
+          p_member_ids: string[];
+          p_phone: string;
+        };
+        Returns: string;
       };
       upsert_member: {
         Args: { p_assembly: string; p_expected_version?: number; p_member: string; p_row: Json };
