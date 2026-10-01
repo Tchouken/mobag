@@ -1141,8 +1141,22 @@ export type Database = {
         };
         Returns: string;
       };
+      grant_proxy_to: {
+        Args: {
+          p_assembly: string;
+          p_derogation_reason?: string;
+          p_grantor: string;
+          p_holder: Json;
+          p_type: Database["public"]["Enums"]["proxy_type"];
+        };
+        Returns: string;
+      };
       import_members: {
         Args: { p_assembly: string; p_dry_run: boolean; p_mode: string; p_rows: Json; p_source?: Json };
+        Returns: Json;
+      };
+      import_proxies: {
+        Args: { p_assembly: string; p_dry_run: boolean; p_rows: Json; p_source?: Json };
         Returns: Json;
       };
       invite_org_member: {
@@ -1154,6 +1168,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       remove_assembly_staff: {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
         Returns: undefined;
@@ -1176,6 +1191,7 @@ export type Database = {
         Returns: undefined;
       };
       set_president: { Args: { p_assembly: string; p_attendee: string }; Returns: Json };
+      set_proxy_document: { Args: { p_path: string; p_proxy: string }; Returns: undefined };
       update_assembly_info: {
         Args: {
           p_assembly: string;
