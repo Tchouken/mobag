@@ -30,13 +30,19 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
 
   database:
-    name: Migrations + pgTAP
+    name: Migrations, pgTAP, tests d'intégration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - uses: supabase/setup-cli@v1
         with:
           version: 2.119.0
       - run: supabase db start
       - run: supabase db lint --fail-on error
       - run: supabase test db
+      - run: npm run test:integration

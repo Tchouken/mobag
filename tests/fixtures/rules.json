@@ -1,0 +1,496 @@
+{
+  "majority": {
+    "valid": [
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "heads",
+            "numerator": "for",
+            "base": "all_members",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          },
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "all_members",
+            "num": 2,
+            "den": 3,
+            "comparison": "gte"
+          }
+        ],
+        "preset": "double_majority"
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "present_represented",
+            "num": 1,
+            "den": 1,
+            "comparison": "gte"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1000,
+            "den": 1000,
+            "comparison": "gte"
+          }
+        ]
+      }
+    ],
+    "invalid": [
+      { "conditions": [] },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          },
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          },
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          },
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          },
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "present_represented",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "everyone",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          { "measure": null, "numerator": "for", "base": "expressed", "num": 1, "den": 2, "comparison": "gt" }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 3,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 0,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 1001,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": "1",
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1.5,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "eq"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt",
+            "extra": true
+          }
+        ]
+      },
+      {
+        "conditions": [{ "measure": "weight", "numerator": "for", "base": "expressed", "num": 1, "den": 2 }]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ],
+        "extra": 1
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "expressed",
+            "num": 1,
+            "den": 2,
+            "comparison": "gt"
+          }
+        ],
+        "preset": 12
+      },
+      { "conditions": "all" },
+      [
+        {
+          "measure": "weight",
+          "numerator": "for",
+          "base": "expressed",
+          "num": 1,
+          "den": 2,
+          "comparison": "gt"
+        }
+      ],
+      "majority"
+    ]
+  },
+  "quorum": {
+    "valid": [
+      { "conditions": [] },
+      { "conditions": [], "preset": "none" },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "present_represented",
+            "base": "all_members",
+            "num": 1,
+            "den": 5,
+            "comparison": "gte"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "heads",
+            "numerator": "present_represented",
+            "base": "all_members",
+            "num": 1,
+            "den": 2,
+            "comparison": "gte"
+          },
+          {
+            "measure": "weight",
+            "numerator": "present_represented",
+            "base": "all_members",
+            "num": 1,
+            "den": 4,
+            "comparison": "gte"
+          }
+        ]
+      }
+    ],
+    "invalid": [
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "present_represented",
+            "base": "expressed",
+            "num": 1,
+            "den": 5,
+            "comparison": "gte"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "for",
+            "base": "all_members",
+            "num": 1,
+            "den": 5,
+            "comparison": "gte"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "measure": "weight",
+            "numerator": "present_represented",
+            "base": null,
+            "num": 1,
+            "den": 5,
+            "comparison": "gte"
+          }
+        ]
+      },
+      { "preset": "none" },
+      {}
+    ]
+  },
+  "proxy": {
+    "valid": [
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": 3,
+        "max_share": { "num": 1, "den": 10 },
+        "share_key": "primary",
+        "combine": "or",
+        "forbid_subdelegation": true,
+        "blank_to": "none",
+        "allow_transfer_on_departure": false,
+        "preset": "copro"
+      },
+      {
+        "max_count": 2,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": false,
+        "blank_to": "board_recommendation",
+        "allow_transfer_on_departure": true
+      }
+    ],
+    "invalid": [
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "tantiemes",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": 0,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": "3",
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": { "num": 11, "den": 10 },
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "xor",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": null,
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": "yes",
+        "blank_to": "president",
+        "allow_transfer_on_departure": true
+      },
+      {
+        "max_count": null,
+        "max_share": null,
+        "share_key": "primary",
+        "combine": "and",
+        "forbid_subdelegation": true,
+        "blank_to": "president",
+        "allow_transfer_on_departure": true,
+        "unknown": 1
+      }
+    ]
+  },
+  "settings": {
+    "valid": [
+      {
+        "allow_vote_change": true,
+        "departure_during_ballot": "transfer_unvoted",
+        "hide_live_trend": true,
+        "single_open_ballot": true
+      },
+      {
+        "allow_vote_change": false,
+        "departure_during_ballot": "freeze",
+        "hide_live_trend": false,
+        "single_open_ballot": false
+      }
+    ],
+    "invalid": [
+      { "allow_vote_change": true, "departure_during_ballot": "transfer_unvoted", "hide_live_trend": true },
+      {
+        "allow_vote_change": true,
+        "departure_during_ballot": "other",
+        "hide_live_trend": true,
+        "single_open_ballot": true
+      },
+      {
+        "allow_vote_change": null,
+        "departure_during_ballot": "freeze",
+        "hide_live_trend": true,
+        "single_open_ballot": true
+      },
+      {
+        "allow_vote_change": true,
+        "departure_during_ballot": "freeze",
+        "hide_live_trend": true,
+        "single_open_ballot": true,
+        "extra": false
+      }
+    ]
+  }
+}
