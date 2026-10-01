@@ -31,3 +31,5 @@ npm test             # Vitest
 npx supabase start   # Postgres local (Docker requis)
 npx supabase test db # pgTAP
 ```
+
+@AGENTS.md

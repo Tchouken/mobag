@@ -1,0 +1,6 @@
+node_modules
+.next
+supabase/.branches
+supabase/.temp
+package-lock.json
+docs/SPEC.md

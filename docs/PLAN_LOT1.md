@@ -88,24 +88,24 @@ mobag/
 
 ### 2.1 Découpage des migrations
 
-| # | Fichier | Contenu |
-|---|---|---|
-| 0001 | `extensions_enums` | `pgcrypto`, `citext`, `pg_cron`, schéma `private` (non exposé), enums |
-| 0002 | `tenancy` | `organizations`, `platform_admins`, `org_members`, `org_invitations`, helpers de droits |
-| 0003 | `audit` | `audit_heads`, `audit_log`, `private.audit()`, triggers append-only, `verify_audit_chain` |
-| 0004 | `assemblies` | `assemblies`, `assembly_staff`, `rule_presets`, `weight_keys`, validation des règles |
-| 0005 | `members` | `members`, `member_weights`, `import_members` |
-| 0006 | `presence_proxies` | `attendees`, `voter_tokens`, `member_presence`, `attendance_events`, `proxies` |
-| 0007 | `resolutions` | `resolutions`, `resolution_versions`, `resolution_attachments` |
-| 0008 | `ballots_votes` | `ballots`, `ballot_eligibility`, `votes`, `vote_events`, `vote_requests`, `results` |
-| 0009 | `rls` | enable/force RLS, politiques SELECT, révocations/grants |
-| 0010 | `rpc_setup` | création d'AG, clés, membres, résolutions, statut, presets |
-| 0011 | `rpc_presence` | `grant_proxy`, `revoke_proxy`, `check_in`, `check_out`, `return_attendee`, `current_quorum` |
-| 0012 | `rpc_ballots` | `open_ballot`, `cast_votes`, `close_ballot`, `compute_result`, `validate_result`, `close_expired_ballots` (pg_cron) |
-| 0013 | `locks` | triggers de verrouillage 5.9, `bureau_override` |
-| 0014 | `realtime` | triggers broadcast, politiques `realtime.messages` |
-| 0015 | `storage` | buckets `signatures`, `proxy-documents`, `attachments`, `exports` + politiques |
-| 0016 | `exports_views` | `exports`, vues `v_attendance_sheet`, `v_ballot_results` |
+| #    | Fichier            | Contenu                                                                                                             |
+| ---- | ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| 0001 | `extensions_enums` | `pgcrypto`, `citext`, `pg_cron`, schéma `private` (non exposé), enums                                               |
+| 0002 | `tenancy`          | `organizations`, `platform_admins`, `org_members`, `org_invitations`, helpers de droits                             |
+| 0003 | `audit`            | `audit_heads`, `audit_log`, `private.audit()`, triggers append-only, `verify_audit_chain`                           |
+| 0004 | `assemblies`       | `assemblies`, `assembly_staff`, `rule_presets`, `weight_keys`, validation des règles                                |
+| 0005 | `members`          | `members`, `member_weights`, `import_members`                                                                       |
+| 0006 | `presence_proxies` | `attendees`, `voter_tokens`, `member_presence`, `attendance_events`, `proxies`                                      |
+| 0007 | `resolutions`      | `resolutions`, `resolution_versions`, `resolution_attachments`                                                      |
+| 0008 | `ballots_votes`    | `ballots`, `ballot_eligibility`, `votes`, `vote_events`, `vote_requests`, `results`                                 |
+| 0009 | `rls`              | enable/force RLS, politiques SELECT, révocations/grants                                                             |
+| 0010 | `rpc_setup`        | création d'AG, clés, membres, résolutions, statut, presets                                                          |
+| 0011 | `rpc_presence`     | `grant_proxy`, `revoke_proxy`, `check_in`, `check_out`, `return_attendee`, `current_quorum`                         |
+| 0012 | `rpc_ballots`      | `open_ballot`, `cast_votes`, `close_ballot`, `compute_result`, `validate_result`, `close_expired_ballots` (pg_cron) |
+| 0013 | `locks`            | triggers de verrouillage 5.9, `bureau_override`                                                                     |
+| 0014 | `realtime`         | triggers broadcast, politiques `realtime.messages`                                                                  |
+| 0015 | `storage`          | buckets `signatures`, `proxy-documents`, `attachments`, `exports` + politiques                                      |
+| 0016 | `exports_views`    | `exports`, vues `v_attendance_sheet`, `v_ballot_results`                                                            |
 
 ### 2.2 Enums
 
@@ -126,6 +126,7 @@ create type ballot_status    as enum ('open','closed','validated','cancelled');
 create type cast_channel     as enum ('device','operator','show_of_hands','correspondence');
 create type ballot_outcome   as enum ('adopted','rejected','no_quorum','information');
 ```
+
 (`multiple_choice`, `election`, `show_of_hands` et `correspondence` existent dès le départ pour éviter des migrations d'enum, mais les RPC du Lot 1 les refusent.)
 
 ### 2.3 Tables
@@ -447,12 +448,14 @@ create table exports (
 ### 2.6 RPC critiques
 
 Conventions communes à toutes les RPC :
+
 - erreurs métier `raise exception using errcode='P0001', message='<code_stable>', detail=<jsonb>` ; `lib/rpc` les traduit en français ;
 - verrou d'assemblée `private.lock_presence(assembly)` (`pg_advisory_xact_lock`) pour sérialiser les mouvements de présence et l'ouverture des scrutins ;
 - contrôle optimiste par `expected_version` ;
 - `private.audit(...)` et `private.notify(...)` (broadcast) dans la même transaction.
 
 **Audit chaîné**
+
 ```sql
 create function private.audit(p_assembly uuid, p_action text, p_payload jsonb, p_attendee uuid default null)
 returns bigint language plpgsql security definer set search_path = '' as $$
@@ -474,6 +477,7 @@ end $$;
 ```
 
 **`grant_proxy(p_grantor uuid, p_holder_attendee uuid, p_type proxy_type, p_document_path text, p_derogation_reason text default null) → uuid`**
+
 1. Droits : organisateur (avant séance) ou bureau/accueil (en séance). L'AG ne doit être ni close ni archivée.
 2. Pouvoir `blank` : le détenteur devient `president_attendee_id` si `blank_to='president'` et le président est désigné, sinon `pending`.
 3. Contrôles (ils sont tous évalués, puis renvoyés ensemble dans `detail`) :
@@ -491,6 +495,7 @@ end $$;
 Statut `revoked`. La présence du mandant est recalculée (présent s'il est en salle, sinon `absent`/`expected`). La règle 5.6.4 s'applique aux scrutins ouverts. Audit + broadcast.
 
 **`check_in(p_attendee uuid, p_signature_path text, p_expected_version int, p_new_attendee jsonb default null) → jsonb`**
+
 1. `lock_presence`, puis contrôle de version. L'attendee passe `present`, avec horodatage et signature. Un attendee peut être créé sur place (ajout en séance, tracé).
 2. Membre propre (`attendees.member_id`) : un pouvoir vivant qu'il avait donné est **révoqué** (raison `mandant_present`, 5.4). Sa présence passe à `present`.
 3. Pouvoirs actifs détenus par l'attendee : leurs mandants passent à `represented`.
@@ -498,10 +503,12 @@ Statut `revoked`. La présence du mandant est recalculée (présent s'il est en 
 5. `attendance_events`, audit, broadcast `quorum`. Retourne le portefeuille (voix par clé).
 
 **`issue_voter_token(p_attendee) → text`** / **`claim_voter_token(p_token text) → jsonb`** / **`revoke_voter_token(p_attendee)`**
+
 - `issue` révoque le jeton précédent, en génère 32 octets aléatoires, stocke leur hash, fixe l'expiration à la fin de l'AG et renvoie l'URL `/v/<token>`.
 - `claim` lie `auth.uid()` (session anonyme) au jeton. Si le jeton est déjà réclamé par un autre uid, il refuse (l'accueil doit réémettre).
 
 **`check_out(p_attendee uuid, p_mode text /*transfer|leave|temporary*/, p_transfer_to uuid, p_expected_version int) → jsonb`**
+
 1. `lock_presence`, contrôle de version. Si `transfer`/`temporary` : le destinataire doit être présent et distinct.
 2. `transfer`/`temporary` :
    - pour le membre propre : création d'un pouvoir `temporary` (`return_expected` si `temporary`), contrôlé par les mêmes règles que `grant_proxy` (fonction interne partagée `private.check_proxy_rules`) ;
@@ -520,6 +527,7 @@ Révoque les pouvoirs `temporary`/enfants issus de son départ, restaure la pré
 Calcule par clé de répartition les poids et les têtes `present / represented / correspondence / left / expected / absent`, le total, le ratio et l'évaluation de `quorum_rule` (`reached`, détail par condition). Le calcul se fait sur `member_presence ⋈ member_weights`. Lecture seule, accessible au staff et à la projection (version agrégée).
 
 **`open_ballot(p_resolution uuid, p_closes_at timestamptz default null) → uuid`**
+
 ```sql
 -- droits : bureau ; AG 'in_session' ; vote_type <> 'information' ; mode électronique (Lot 1)
 perform private.lock_presence(v_assembly);             -- instantané cohérent avec check-in/out
@@ -542,6 +550,7 @@ where id = v_ballot;
 ```
 
 **`cast_votes(p_ballot uuid, p_items jsonb /*[{member_id, choice}]*/, p_idempotency_key uuid) → jsonb`** (chemin chaud)
+
 ```sql
 -- 1. idempotence : réserve la clé ; une requête concurrente sur la même clé attend le commit puis relit
 insert into public.vote_requests(idempotency_key, attendee_id, ballot_id) values (p_key, v_attendee, p_ballot)
@@ -576,12 +585,14 @@ return v_resp;   -- {status:'recorded', ballot_id, members:[…], at}
 ```
 
 **`close_ballot(p_ballot uuid) → jsonb`**
+
 1. Droits bureau. `pg_advisory_xact_lock(ballot_lock_key)` en exclusif : il attend la fin des votes en cours.
 2. `status='closed'`, `closed_at`. `votes_digest = sha256` de la concaténation ordonnée (`vote_events.id`) des événements.
 3. `compute_result`. Audit `ballot.closed` avec le digest et le résultat provisoire. Broadcast.
 4. `close_expired_ballots()` est lancé par pg_cron toutes les 5 s et clôt les scrutins dont `closes_at` est passé. Entre-temps, `cast_votes` les refuse déjà.
 
 **`compute_result(p_ballot uuid) → jsonb`**
+
 1. Agrège `votes` par choix (poids, têtes) et calcule le reste en `not_voted`.
 2. Appelle `private.evaluate_rule(rule jsonb, tallies jsonb, totals jsonb, abstention_policy text) → jsonb`, une fonction **IMMUTABLE pure** testée en pgTAP par matrice : presets × égalités × abstentions incluses ou exclues × base vide.
 3. Évalue d'abord le quorum (si non atteint : `no_quorum`), puis la majorité.
@@ -591,17 +602,20 @@ return v_resp;   -- {status:'recorded', ballot_id, members:[…], at}
 Réservé au président (ou rôle configuré). Le scrutin doit être `closed` : il passe `validated` (`validated_by/at`). Audit `result.validated`, broadcast `result` vers la projection.
 
 **`set_assembly_status(p_assembly, p_to assembly_status, p_reason text)`**
+
 - Transitions autorisées : `draft→convened→in_session→closed→archived` (retour `convened→draft` interdit après envoi : Lot 2).
 - Le passage `in_session` initialise `member_presence` pour tous les membres (en conservant les `represented` issus des pouvoirs avant séance dont le détenteur est déjà présent), puis attribue les pouvoirs en blanc au président.
 - Le passage `closed` exige qu'aucun scrutin ne soit ouvert.
 
 **Verrous 5.9 (migration 0013)**
+
 - Triggers `BEFORE INSERT/UPDATE/DELETE` sur `member_weights`, `weight_keys`, `members` (poids), et sur `resolutions` dès qu'un scrutin existe.
 - Si l'AG est `in_session` : refus, sauf si `current_setting('app.bureau_override', true) = 'on'`. Ce réglage est positionné uniquement par la RPC `bureau_override(p_assembly, p_action jsonb, p_reason text)` (bureau, motif obligatoire, audit).
 - Si l'AG est `closed`/`archived` : refus total.
 - Après convocation, toute modification de résolution incrémente `version` et écrit `resolution_versions` (trigger).
 
 **Setup (migration 0010, plus simple)**
+
 - `create_assembly`, `upsert_weight_key`, `upsert_member` (avec ses poids) ;
 - `import_members(p_assembly, p_rows jsonb, p_dry_run bool) → rapport` : validation ligne à ligne, doublons sur `external_ref`/e-mail, poids négatifs, écarts entre le total importé et `total_declared` par clé. **Tout ou rien** ;
 - `upsert_resolution`, `reorder_resolutions(p_ids uuid[])`, `set_president`, `assign_staff`, `projection_rotate_token`, `projection_state(p_token)` (anon, données publiques uniquement).
@@ -610,27 +624,27 @@ Réservé au président (ou rôle configuré). Le scrutin doit être `closed` : 
 
 ## 3. Découpage du Lot 1 (tâches ordonnées, un commit cohérent ou plus par tâche)
 
-| # | Tâche | Livrable / critère de fin |
-|---|---|---|
-| **T0** | Bootstrap | `docs/SPEC.md` (copie du CDC), `CLAUDE.md`, Next.js App Router + TS strict + Tailwind + shadcn, ESLint/Prettier, Vitest, `supabase init`, CI GitHub Actions (lint, typecheck, vitest, `supabase start` + `supabase test db`), projet Vercel en région UE |
-| **T1** | Socle SQL : enums, tenancy, helpers de droits, **audit chaîné** + append-only + `verify_audit_chain` | migrations 0001–0003 + pgTAP (chaîne valide, altération détectée, UPDATE/DELETE refusés même au service role) |
-| **T2** | Auth staff (magic link), middleware, organisations, invitations, rôles, super-admin | pages login/orgs ; pgTAP d'**isolation inter-organisations** sur toutes les tables existantes |
-| **T3** | AG + clés de répartition + statuts + presets | migration 0004 (+ seed `rule_presets`), `validate_rule` (SQL) ≡ schéma Zod (tests croisés sur les mêmes fixtures), UI création/paramétrage |
-| **T4** | Membres + **import CSV/XLSX** | `import_members` + pgTAP ; assistant UI (upload → mapping → prévisualisation → erreurs/doublons → contrôle des totaux → rapport) ; édition manuelle |
-| **T5** | Résolutions | migration 0007, RPC, versionnage, tri par glisser-déposer, éditeur Tiptap, éditeur de règle avec presets, pièces jointes Storage |
-| **T6** | **Moteur présence/pouvoirs (SQL)** | migrations 0006/0011 : `grant_proxy`, `revoke_proxy`, `check_in`, `check_out` (a/b/c), `return_attendee`, `current_quorum`, `set_assembly_status` ; pgTAP exhaustif (plafonds and/or, sous-délégation, non-éligibles, blancs → président, mandant arrivant, départs) ; tests de concurrence Vitest (deux postes d'accueil sur la même personne) |
-| **T7** | UI pouvoirs avant séance | saisie, import, scan du pouvoir, blancs, messages FR explicites, dérogation bureau |
-| **T8** | Identité votant | `voter_tokens`, issue/claim/revoke, page `/v/[token]` (session anonyme Supabase), QR |
-| **T9** | **Émargement tablette** | recherche instantanée, scan QR (BarcodeDetector + repli `@zxing/browser`), parcours d'arrivée, pad de signature → Storage, affectation du terminal (QR à scanner par le votant / tablette prêtée), départ 5.6 avec proposition d'une alternative si plafond, conflits optimistes |
-| **T10** | **Moteur de scrutin (SQL)** | migration 0012 : `open_ballot`, `cast_votes`, `close_ballot`, `compute_result`, `evaluate_rule`, `validate_result`, pg_cron ; pgTAP (matrice des majorités, instantané, retardataire exclu, 5.6.4, vote modifié/interdit, idempotence) ; tests de concurrence (même clé ×N en parallèle, clôture pendant un flux de votes : aucun vote après `closed_at`, unicité) |
-| **T11** | Temps réel | migration 0014 (triggers `realtime.send`, RLS `realtime.messages`), hook `useAssemblyChannel` avec bascule polling 3 s (testée en coupant le WebSocket) |
-| **T12** | **Régie** | dashboard quorum par clé, terminaux connectés (Presence), ordre du jour, ouverture/clôture/minuteur, participation sans tendance, provisoire → validation → publication ; verrous 5.9 (migration 0013) + `bureau_override` |
-| **T13** | **Interface votant mobile** | attente → résolution → choix → confirmation → accusé ; « même vote / vote par mandant » ; file d'envoi idempotente avec réessai exponentiel, « enregistré » affiché uniquement sur réponse serveur ; récapitulatif des voix par clé ; accessibilité (contrastes AA, cibles ≥ 48 px, ARIA, test axe) |
-| **T14** | Écran de projection | `/projection/[token]`, plein écran, quorum, compte à rebours, participation, résultat validé (graphique barres) |
-| **T15** | Exports | migration 0016 ; route Node : feuille de présence PDF/XLSX (avec signatures), résultats PDF/XLSX (+CSV) ; stockage, SHA-256, URL signées |
-| **T16** | Données de démo + E2E | seeds copro 120 lots/3 clés, SAS 40, asso 1 500 ; Playwright : import → pouvoirs → émargement → départ avec transfert → vote multi-terminal → résultat → validation → export |
-| **T17** | Charge k6 | scénarios 2 000 votants / rafale 500 votes/s à l'ouverture ; rapport p95/p99 ; optimisations (index, taille du pool) ; vérification des quotas Realtime |
-| **T18** | Durcissement et clôture du lot | CSP/HSTS/CSRF, Sentry, check GitHub « gel des déploiements » (flag AG en cours), README, ARCHITECTURE, RUNBOOK (brouillon, dont le mode dégradé), déploiement preview Vercel, `docs/lots/LOT1_NOTE.md` |
+| #       | Tâche                                                                                                | Livrable / critère de fin                                                                                                                                                                                                                                                                                                                                          |
+| ------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **T0**  | Bootstrap                                                                                            | `docs/SPEC.md` (copie du CDC), `CLAUDE.md`, Next.js App Router + TS strict + Tailwind + shadcn, ESLint/Prettier, Vitest, `supabase init`, CI GitHub Actions (lint, typecheck, vitest, `supabase start` + `supabase test db`), projet Vercel en région UE                                                                                                           |
+| **T1**  | Socle SQL : enums, tenancy, helpers de droits, **audit chaîné** + append-only + `verify_audit_chain` | migrations 0001–0003 + pgTAP (chaîne valide, altération détectée, UPDATE/DELETE refusés même au service role)                                                                                                                                                                                                                                                      |
+| **T2**  | Auth staff (magic link), middleware, organisations, invitations, rôles, super-admin                  | pages login/orgs ; pgTAP d'**isolation inter-organisations** sur toutes les tables existantes                                                                                                                                                                                                                                                                      |
+| **T3**  | AG + clés de répartition + statuts + presets                                                         | migration 0004 (+ seed `rule_presets`), `validate_rule` (SQL) ≡ schéma Zod (tests croisés sur les mêmes fixtures), UI création/paramétrage                                                                                                                                                                                                                         |
+| **T4**  | Membres + **import CSV/XLSX**                                                                        | `import_members` + pgTAP ; assistant UI (upload → mapping → prévisualisation → erreurs/doublons → contrôle des totaux → rapport) ; édition manuelle                                                                                                                                                                                                                |
+| **T5**  | Résolutions                                                                                          | migration 0007, RPC, versionnage, tri par glisser-déposer, éditeur Tiptap, éditeur de règle avec presets, pièces jointes Storage                                                                                                                                                                                                                                   |
+| **T6**  | **Moteur présence/pouvoirs (SQL)**                                                                   | migrations 0006/0011 : `grant_proxy`, `revoke_proxy`, `check_in`, `check_out` (a/b/c), `return_attendee`, `current_quorum`, `set_assembly_status` ; pgTAP exhaustif (plafonds and/or, sous-délégation, non-éligibles, blancs → président, mandant arrivant, départs) ; tests de concurrence Vitest (deux postes d'accueil sur la même personne)                    |
+| **T7**  | UI pouvoirs avant séance                                                                             | saisie, import, scan du pouvoir, blancs, messages FR explicites, dérogation bureau                                                                                                                                                                                                                                                                                 |
+| **T8**  | Identité votant                                                                                      | `voter_tokens`, issue/claim/revoke, page `/v/[token]` (session anonyme Supabase), QR                                                                                                                                                                                                                                                                               |
+| **T9**  | **Émargement tablette**                                                                              | recherche instantanée, scan QR (BarcodeDetector + repli `@zxing/browser`), parcours d'arrivée, pad de signature → Storage, affectation du terminal (QR à scanner par le votant / tablette prêtée), départ 5.6 avec proposition d'une alternative si plafond, conflits optimistes                                                                                   |
+| **T10** | **Moteur de scrutin (SQL)**                                                                          | migration 0012 : `open_ballot`, `cast_votes`, `close_ballot`, `compute_result`, `evaluate_rule`, `validate_result`, pg_cron ; pgTAP (matrice des majorités, instantané, retardataire exclu, 5.6.4, vote modifié/interdit, idempotence) ; tests de concurrence (même clé ×N en parallèle, clôture pendant un flux de votes : aucun vote après `closed_at`, unicité) |
+| **T11** | Temps réel                                                                                           | migration 0014 (triggers `realtime.send`, RLS `realtime.messages`), hook `useAssemblyChannel` avec bascule polling 3 s (testée en coupant le WebSocket)                                                                                                                                                                                                            |
+| **T12** | **Régie**                                                                                            | dashboard quorum par clé, terminaux connectés (Presence), ordre du jour, ouverture/clôture/minuteur, participation sans tendance, provisoire → validation → publication ; verrous 5.9 (migration 0013) + `bureau_override`                                                                                                                                         |
+| **T13** | **Interface votant mobile**                                                                          | attente → résolution → choix → confirmation → accusé ; « même vote / vote par mandant » ; file d'envoi idempotente avec réessai exponentiel, « enregistré » affiché uniquement sur réponse serveur ; récapitulatif des voix par clé ; accessibilité (contrastes AA, cibles ≥ 48 px, ARIA, test axe)                                                                |
+| **T14** | Écran de projection                                                                                  | `/projection/[token]`, plein écran, quorum, compte à rebours, participation, résultat validé (graphique barres)                                                                                                                                                                                                                                                    |
+| **T15** | Exports                                                                                              | migration 0016 ; route Node : feuille de présence PDF/XLSX (avec signatures), résultats PDF/XLSX (+CSV) ; stockage, SHA-256, URL signées                                                                                                                                                                                                                           |
+| **T16** | Données de démo + E2E                                                                                | seeds copro 120 lots/3 clés, SAS 40, asso 1 500 ; Playwright : import → pouvoirs → émargement → départ avec transfert → vote multi-terminal → résultat → validation → export                                                                                                                                                                                       |
+| **T17** | Charge k6                                                                                            | scénarios 2 000 votants / rafale 500 votes/s à l'ouverture ; rapport p95/p99 ; optimisations (index, taille du pool) ; vérification des quotas Realtime                                                                                                                                                                                                            |
+| **T18** | Durcissement et clôture du lot                                                                       | CSP/HSTS/CSRF, Sentry, check GitHub « gel des déploiements » (flag AG en cours), README, ARCHITECTURE, RUNBOOK (brouillon, dont le mode dégradé), déploiement preview Vercel, `docs/lots/LOT1_NOTE.md`                                                                                                                                                             |
 
 Chemin critique : T0 → T1 → T3 → T4 → T6 → T10 → T12/T13. Les UI T7/T9 suivent T6, T14/T15 suivent T10.
 
@@ -640,15 +654,15 @@ Chemin critique : T0 → T1 → T3 → T4 → T6 → T10 → T12/T13. Les UI T7/
 
 ### Section 9 du CDC : celles qui bloquent le Lot 1
 
-| # | Question | Bloquant ? | Ce qui en dépend |
-|---|---|---|---|
-| 1 | Types d'AG prioritaires | **Oui** (avant T3) | presets de majorité, de quorum et de pouvoirs ; jeux de démo ; formats de règles (ex. double majorité copro) |
-| 2 | Taille maximale visée | **Oui** (avant T17, et pour commander le plan) | Supabase Pro limite par défaut les connexions Realtime simultanées (~500) : 2 000 votants imposent un add-on ou un plan supérieur ; calibrage k6 |
-| 3 | Terminaux (smartphone perso, tablettes prêtées, les deux) | **Oui** (avant T8/T9) | modèle d'identité votant : avec des tablettes partagées, il faut un mode kiosque et une réaffectation entre personnes |
-| 4 | Valeur juridique de la signature à l'écran | **Oui, sous forme de confirmation** (avant T9) | je pars sur une signature manuscrite à l'écran (image + horodatage + hash dans l'audit). Une signature qualifiée (Yousign…) changerait tout le parcours d'émargement |
-| 5 | Modèle de vote secret (7.3) | **Oui, sous forme de confirmation** (avant T10) | le schéma lie le vote au membre (`unique(ballot_id, member_id)`). Un anonymat cryptographique remettrait en cause `votes`, l'unicité et la modification du vote |
-| 6 | Qui opère le jour J | Non pour démarrer, **oui avant T12** | densité et garde-fous de la régie, documentation |
-| 7 | Validation juriste des presets | Non pour développer, **bloquant pour la mise en production** | `rule_presets.validated_by_lawyer` |
+| #   | Question                                                  | Bloquant ?                                                   | Ce qui en dépend                                                                                                                                                     |
+| --- | --------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Types d'AG prioritaires                                   | **Oui** (avant T3)                                           | presets de majorité, de quorum et de pouvoirs ; jeux de démo ; formats de règles (ex. double majorité copro)                                                         |
+| 2   | Taille maximale visée                                     | **Oui** (avant T17, et pour commander le plan)               | Supabase Pro limite par défaut les connexions Realtime simultanées (~500) : 2 000 votants imposent un add-on ou un plan supérieur ; calibrage k6                     |
+| 3   | Terminaux (smartphone perso, tablettes prêtées, les deux) | **Oui** (avant T8/T9)                                        | modèle d'identité votant : avec des tablettes partagées, il faut un mode kiosque et une réaffectation entre personnes                                                |
+| 4   | Valeur juridique de la signature à l'écran                | **Oui, sous forme de confirmation** (avant T9)               | je pars sur une signature manuscrite à l'écran (image + horodatage + hash dans l'audit). Une signature qualifiée (Yousign…) changerait tout le parcours d'émargement |
+| 5   | Modèle de vote secret (7.3)                               | **Oui, sous forme de confirmation** (avant T10)              | le schéma lie le vote au membre (`unique(ballot_id, member_id)`). Un anonymat cryptographique remettrait en cause `votes`, l'unicité et la modification du vote      |
+| 6   | Qui opère le jour J                                       | Non pour démarrer, **oui avant T12**                         | densité et garde-fous de la régie, documentation                                                                                                                     |
+| 7   | Validation juriste des presets                            | Non pour développer, **bloquant pour la mise en production** | `rule_presets.validated_by_lawyer`                                                                                                                                   |
 
 ### Ambiguïtés du CDC relevées (bloquantes pour T6/T10)
 
