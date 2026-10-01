@@ -42,7 +42,18 @@ const MESSAGES: Record<string, string> = {
   too_many_rows: "Le fichier dépasse 20 000 lignes.",
   invalid_member: "Les informations du membre sont invalides.",
   ref_exists: "Cette référence est déjà utilisée par un autre membre de l'assemblée.",
-  weight_key_in_use: "Des membres ont des voix sur cette clé : mettez-les à zéro avant de la supprimer.",
+  weight_key_in_use:
+    "Cette clé est utilisée (voix de membres ou résolutions) : retirez ces usages avant de la supprimer.",
+  invalid_resolution: "Les informations de la résolution sont invalides.",
+  vote_type_not_available: "Ce type de vote n'est pas encore disponible.",
+  invalid_majority_rule: "La règle de majorité est invalide.",
+  invalid_weight_key: "Clé de répartition invalide.",
+  invalid_parent: "Rattachement impossible : un seul niveau de sous-résolutions est autorisé.",
+  reason_required: "L'assemblée a été convoquée : indiquez le motif de la modification.",
+  has_children: "Supprimez d'abord les sous-résolutions.",
+  invalid_order: "L'ordre du jour a changé entre-temps : rechargez la page.",
+  invalid_attachment: "Pièce jointe invalide.",
+  attachment_not_uploaded: "Le fichier n'a pas été reçu : recommencez le dépôt.",
 };
 
 const FALLBACK = "Une erreur inattendue est survenue. Réessayez ou contactez le support.";

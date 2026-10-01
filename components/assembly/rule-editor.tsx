@@ -15,6 +15,7 @@ export type Preset = {
   description_fr: string | null;
   legal_reference: string | null;
   params: unknown;
+  abstention_policy?: string | null;
 };
 
 type Rule = QuorumRule | MajorityRule;
@@ -26,6 +27,7 @@ type Props<K extends "quorum" | "majority"> = {
   presets: Preset[];
   disabled?: boolean;
   idPrefix: string;
+  onPresetSelect?: (preset: Preset) => void;
 };
 
 const FAMILY_ORDER = ["company", "association", "copro", "generic"];
@@ -80,6 +82,7 @@ export function RuleEditor<K extends "quorum" | "majority">({
   presets,
   disabled,
   idPrefix,
+  onPresetSelect,
 }: Props<K>) {
   const rule = value as Rule;
   const selected = presets.find((p) => p.code === rule.preset);
@@ -115,7 +118,11 @@ export function RuleEditor<K extends "quorum" | "majority">({
           presets={presets}
           value={rule.preset}
           disabled={disabled}
-          onSelect={(p) => p && onChange(p.params as Out)}
+          onSelect={(p) => {
+            if (!p) return;
+            onChange(p.params as Out);
+            onPresetSelect?.(p);
+          }}
         />
         {selected && (selected.description_fr || selected.legal_reference) && (
           <p className="text-muted-foreground text-sm">

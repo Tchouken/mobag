@@ -508,6 +508,192 @@ export type Database = {
         };
         Relationships: [];
       };
+      resolution_attachments: {
+        Row: {
+          assembly_id: string;
+          created_at: string;
+          filename: string;
+          id: string;
+          path: string;
+          resolution_id: string;
+          size_bytes: number;
+          uploaded_by: string | null;
+        };
+        Insert: {
+          assembly_id: string;
+          created_at?: string;
+          filename: string;
+          id?: string;
+          path: string;
+          resolution_id: string;
+          size_bytes: number;
+          uploaded_by?: string | null;
+        };
+        Update: {
+          assembly_id?: string;
+          created_at?: string;
+          filename?: string;
+          id?: string;
+          path?: string;
+          resolution_id?: string;
+          size_bytes?: number;
+          uploaded_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "resolution_attachments_resolution_id_assembly_id_fkey";
+            columns: ["resolution_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "resolutions";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
+      resolution_versions: {
+        Row: {
+          assembly_id: string;
+          assembly_status: Database["public"]["Enums"]["assembly_status"];
+          change_kind: string;
+          changed_at: string;
+          changed_by: string | null;
+          id: number;
+          reason: string | null;
+          resolution_id: string;
+          snapshot: NonNullable<Json>;
+          version: number;
+        };
+        Insert: {
+          assembly_id: string;
+          assembly_status: Database["public"]["Enums"]["assembly_status"];
+          change_kind: string;
+          changed_at?: string;
+          changed_by?: string | null;
+          id?: never;
+          reason?: string | null;
+          resolution_id: string;
+          snapshot: NonNullable<Json>;
+          version: number;
+        };
+        Update: {
+          assembly_id?: string;
+          assembly_status?: Database["public"]["Enums"]["assembly_status"];
+          change_kind?: string;
+          changed_at?: string;
+          changed_by?: string | null;
+          id?: never;
+          reason?: string | null;
+          resolution_id?: string;
+          snapshot?: NonNullable<Json>;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "resolution_versions_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      resolutions: {
+        Row: {
+          abstention_policy: string;
+          allow_vote_change: boolean | null;
+          assembly_id: string;
+          board_recommendation: string | null;
+          body: NonNullable<Json>;
+          body_text: string;
+          created_at: string;
+          id: string;
+          is_secret: boolean;
+          majority_rule: Json | null;
+          mode: Database["public"]["Enums"]["resolution_mode"];
+          number: string;
+          parent_id: string | null;
+          position: number;
+          quorum_rule: Json | null;
+          title: string;
+          updated_at: string;
+          version: number;
+          vote_type: Database["public"]["Enums"]["vote_type"];
+          weight_key_id: string;
+        };
+        Insert: {
+          abstention_policy?: string;
+          allow_vote_change?: boolean | null;
+          assembly_id: string;
+          board_recommendation?: string | null;
+          body?: NonNullable<Json>;
+          body_text?: string;
+          created_at?: string;
+          id?: string;
+          is_secret?: boolean;
+          majority_rule?: Json | null;
+          mode?: Database["public"]["Enums"]["resolution_mode"];
+          number?: string;
+          parent_id?: string | null;
+          position: number;
+          quorum_rule?: Json | null;
+          title: string;
+          updated_at?: string;
+          version?: number;
+          vote_type?: Database["public"]["Enums"]["vote_type"];
+          weight_key_id: string;
+        };
+        Update: {
+          abstention_policy?: string;
+          allow_vote_change?: boolean | null;
+          assembly_id?: string;
+          board_recommendation?: string | null;
+          body?: NonNullable<Json>;
+          body_text?: string;
+          created_at?: string;
+          id?: string;
+          is_secret?: boolean;
+          majority_rule?: Json | null;
+          mode?: Database["public"]["Enums"]["resolution_mode"];
+          number?: string;
+          parent_id?: string | null;
+          position?: number;
+          quorum_rule?: Json | null;
+          title?: string;
+          updated_at?: string;
+          version?: number;
+          vote_type?: Database["public"]["Enums"]["vote_type"];
+          weight_key_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "resolutions_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "resolutions_parent_id_assembly_id_fkey";
+            columns: ["parent_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "resolutions";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "resolutions_weight_key_id_assembly_id_fkey";
+            columns: ["weight_key_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "weight_key_totals";
+            referencedColumns: ["weight_key_id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "resolutions_weight_key_id_assembly_id_fkey";
+            columns: ["weight_key_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "weight_keys";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
       rule_presets: {
         Row: {
           abstention_policy: string | null;
@@ -618,6 +804,10 @@ export type Database = {
     };
     Functions: {
       accept_org_invitation: { Args: { p_token: string }; Returns: string };
+      add_resolution_attachment: {
+        Args: { p_filename: string; p_path: string; p_resolution: string };
+        Returns: string;
+      };
       assign_assembly_staff: {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
         Returns: undefined;
@@ -637,6 +827,7 @@ export type Database = {
       };
       create_organization: { Args: { p_name: string; p_slug: string }; Returns: string };
       delete_member: { Args: { p_member: string }; Returns: undefined };
+      delete_resolution: { Args: { p_reason?: string; p_resolution: string }; Returns: undefined };
       delete_weight_key: { Args: { p_key: string }; Returns: undefined };
       get_org_invitation: { Args: { p_token: string }; Returns: Json };
       import_members: {
@@ -657,6 +848,11 @@ export type Database = {
         Returns: undefined;
       };
       remove_org_member: { Args: { p_org: string; p_user: string }; Returns: undefined };
+      remove_resolution_attachment: { Args: { p_attachment: string }; Returns: string };
+      reorder_resolutions: {
+        Args: { p_assembly: string; p_ordered_ids: string[]; p_parent: string };
+        Returns: undefined;
+      };
       revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
       set_assembly_status: {
         Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
@@ -692,6 +888,16 @@ export type Database = {
       };
       upsert_member: {
         Args: { p_assembly: string; p_expected_version?: number; p_member: string; p_row: Json };
+        Returns: string;
+      };
+      upsert_resolution: {
+        Args: {
+          p_assembly: string;
+          p_data: Json;
+          p_expected_version?: number;
+          p_reason?: string;
+          p_resolution: string;
+        };
         Returns: string;
       };
       upsert_weight_key: {

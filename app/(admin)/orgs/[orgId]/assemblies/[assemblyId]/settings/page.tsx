@@ -3,6 +3,7 @@ import { Alert } from "@/components/ui/alert";
 import { isEditableStatus } from "@/lib/assembly-labels";
 import { requireAssembly } from "@/lib/auth/assembly";
 import { proxyRulesSchema, quorumRuleSchema, settingsSchema } from "@/lib/domain/rules";
+import { loadPresets } from "@/lib/presets";
 
 export default async function SettingsPage({
   params,
@@ -10,16 +11,7 @@ export default async function SettingsPage({
   const { orgId, assemblyId } = await params;
   const { supabase, org, assembly, canManage } = await requireAssembly(orgId, assemblyId);
 
-  const { data: presets, error } = await supabase
-    .from("rule_presets")
-    .select("code, kind, assembly_family, legal_form, label_fr, description_fr, legal_reference, params")
-    .in("kind", ["quorum", "proxy"])
-    .in("assembly_family", ["generic", assembly.legal_family])
-    .order("position");
-  if (error) throw error;
-
-  // Ne propose que les presets de la forme juridique de l'AG (ou sans forme).
-  const relevant = presets.filter((p) => !p.legal_form || p.legal_form === assembly.legal_form);
+  const relevant = await loadPresets(supabase, assembly, ["quorum", "proxy"]);
 
   return (
     <div className="flex flex-col gap-4">
