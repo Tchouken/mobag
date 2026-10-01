@@ -43,3 +43,21 @@ describe("slugify", () => {
     expect(slugify("Résidence « Les Pins » n°3")).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
   });
 });
+
+describe("toLocalParts", () => {
+  it("rend l'heure murale du fuseau de l'assemblée (heure d'été)", async () => {
+    const { toLocalParts } = await import("@/lib/assembly-labels");
+    expect(toLocalParts("2026-06-15T12:00:00Z", "Europe/Paris")).toEqual({
+      date: "2026-06-15",
+      time: "14:00",
+    });
+  });
+
+  it("gère un fuseau d'outre-mer", async () => {
+    const { toLocalParts } = await import("@/lib/assembly-labels");
+    expect(toLocalParts("2026-01-10T08:30:00Z", "Indian/Reunion")).toEqual({
+      date: "2026-01-10",
+      time: "12:30",
+    });
+  });
+});

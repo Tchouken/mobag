@@ -23,6 +23,126 @@ export type Database = {
   };
   public: {
     Tables: {
+      assemblies: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          id: string;
+          is_rehearsal: boolean;
+          legal_family: string;
+          legal_form: string | null;
+          location: string | null;
+          mode: Database["public"]["Enums"]["assembly_mode"];
+          org_id: string;
+          president_attendee_id: string | null;
+          proxy_rules: NonNullable<Json>;
+          quorum_rule: Json | null;
+          settings: NonNullable<Json>;
+          starts_at: string;
+          status: Database["public"]["Enums"]["assembly_status"];
+          timezone: string;
+          title: string;
+          type: Database["public"]["Enums"]["assembly_type"];
+          updated_at: string;
+          version: number;
+        };
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          is_rehearsal?: boolean;
+          legal_family: string;
+          legal_form?: string | null;
+          location?: string | null;
+          mode?: Database["public"]["Enums"]["assembly_mode"];
+          org_id: string;
+          president_attendee_id?: string | null;
+          proxy_rules: NonNullable<Json>;
+          quorum_rule?: Json | null;
+          settings?: NonNullable<Json>;
+          starts_at: string;
+          status?: Database["public"]["Enums"]["assembly_status"];
+          timezone?: string;
+          title: string;
+          type: Database["public"]["Enums"]["assembly_type"];
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          is_rehearsal?: boolean;
+          legal_family?: string;
+          legal_form?: string | null;
+          location?: string | null;
+          mode?: Database["public"]["Enums"]["assembly_mode"];
+          org_id?: string;
+          president_attendee_id?: string | null;
+          proxy_rules?: NonNullable<Json>;
+          quorum_rule?: Json | null;
+          settings?: NonNullable<Json>;
+          starts_at?: string;
+          status?: Database["public"]["Enums"]["assembly_status"];
+          timezone?: string;
+          title?: string;
+          type?: Database["public"]["Enums"]["assembly_type"];
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "assemblies_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "assemblies_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      assembly_staff: {
+        Row: {
+          assembly_id: string;
+          created_at: string;
+          role: Database["public"]["Enums"]["staff_role"];
+          user_id: string;
+        };
+        Insert: {
+          assembly_id: string;
+          created_at?: string;
+          role: Database["public"]["Enums"]["staff_role"];
+          user_id: string;
+        };
+        Update: {
+          assembly_id?: string;
+          created_at?: string;
+          role?: Database["public"]["Enums"]["staff_role"];
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "assembly_staff_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "assembly_staff_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_heads: {
         Row: {
           chain_id: string;
@@ -85,6 +205,13 @@ export type Database = {
           seq?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: "audit_log_assembly_fk";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "audit_log_org_id_fkey";
             columns: ["org_id"];
@@ -276,13 +403,114 @@ export type Database = {
         };
         Relationships: [];
       };
+      rule_presets: {
+        Row: {
+          abstention_policy: string | null;
+          assembly_family: string;
+          code: string;
+          description_fr: string | null;
+          kind: string;
+          label_fr: string;
+          legal_form: string | null;
+          legal_reference: string | null;
+          params: NonNullable<Json>;
+          position: number;
+          validated_by_lawyer: boolean;
+        };
+        Insert: {
+          abstention_policy?: string | null;
+          assembly_family: string;
+          code: string;
+          description_fr?: string | null;
+          kind: string;
+          label_fr: string;
+          legal_form?: string | null;
+          legal_reference?: string | null;
+          params: NonNullable<Json>;
+          position?: number;
+          validated_by_lawyer?: boolean;
+        };
+        Update: {
+          abstention_policy?: string | null;
+          assembly_family?: string;
+          code?: string;
+          description_fr?: string | null;
+          kind?: string;
+          label_fr?: string;
+          legal_form?: string | null;
+          legal_reference?: string | null;
+          params?: NonNullable<Json>;
+          position?: number;
+          validated_by_lawyer?: boolean;
+        };
+        Relationships: [];
+      };
+      weight_keys: {
+        Row: {
+          assembly_id: string;
+          code: string;
+          created_at: string;
+          id: string;
+          is_primary: boolean;
+          label: string;
+          position: number;
+          total_declared: number | null;
+        };
+        Insert: {
+          assembly_id: string;
+          code: string;
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          label: string;
+          position?: number;
+          total_declared?: number | null;
+        };
+        Update: {
+          assembly_id?: string;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          label?: string;
+          position?: number;
+          total_declared?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "weight_keys_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
       accept_org_invitation: { Args: { p_token: string }; Returns: string };
+      assign_assembly_staff: {
+        Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
+        Returns: undefined;
+      };
+      create_assembly: {
+        Args: {
+          p_legal_family: string;
+          p_legal_form: string;
+          p_location?: string;
+          p_org: string;
+          p_starts_local: string;
+          p_timezone?: string;
+          p_title: string;
+          p_type: Database["public"]["Enums"]["assembly_type"];
+        };
+        Returns: string;
+      };
       create_organization: { Args: { p_name: string; p_slug: string }; Returns: string };
+      delete_weight_key: { Args: { p_key: string }; Returns: undefined };
       get_org_invitation: { Args: { p_token: string }; Returns: Json };
       invite_org_member: {
         Args: {
@@ -293,11 +521,54 @@ export type Database = {
         };
         Returns: Json;
       };
+      remove_assembly_staff: {
+        Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
+        Returns: undefined;
+      };
       remove_org_member: { Args: { p_org: string; p_user: string }; Returns: undefined };
       revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
+      set_assembly_status: {
+        Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
+        Returns: number;
+      };
       set_org_member_role: {
         Args: { p_org: string; p_role: Database["public"]["Enums"]["org_role"]; p_user: string };
         Returns: undefined;
+      };
+      update_assembly_info: {
+        Args: {
+          p_assembly: string;
+          p_expected_version: number;
+          p_legal_family: string;
+          p_legal_form: string;
+          p_location: string;
+          p_starts_local: string;
+          p_timezone: string;
+          p_title: string;
+          p_type: Database["public"]["Enums"]["assembly_type"];
+        };
+        Returns: number;
+      };
+      update_assembly_rules: {
+        Args: {
+          p_assembly: string;
+          p_expected_version: number;
+          p_proxy_rules: Json;
+          p_quorum_rule: Json;
+          p_settings: Json;
+        };
+        Returns: number;
+      };
+      upsert_weight_key: {
+        Args: {
+          p_assembly: string;
+          p_code: string;
+          p_is_primary: boolean;
+          p_key: string;
+          p_label: string;
+          p_total_declared: number;
+        };
+        Returns: string;
       };
       verify_audit_chain: { Args: { p_chain_id: string }; Returns: Json };
     };

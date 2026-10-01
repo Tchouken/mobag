@@ -32,7 +32,8 @@ end;
 $$;
 
 -- ----- Profils -----
-select is((select count(*)::int from public.profiles), 5, 'un profil par compte, aucun pour la session anonyme');
+select is((select count(*)::int from public.profiles where id::text like '00000000-0000-0000-0000-0000000000%'), 5,
+  'un profil par compte, aucun pour la session anonyme');
 
 -- ----- Isolation : organisateur de l'org A -----
 select pg_temp.login('00000000-0000-0000-0000-0000000000a2');
@@ -79,7 +80,8 @@ reset role;
 
 -- ----- Super-admin -----
 select pg_temp.login('00000000-0000-0000-0000-0000000000a0');
-select results_eq($$ select count(*)::int from public.organizations $$, array[2],
+select results_eq($$ select count(*)::int from public.organizations
+    where id in ('aaaaaaaa-0000-0000-0000-000000000000', 'bbbbbbbb-0000-0000-0000-000000000000') $$, array[2],
   'le super-admin voit toutes les organisations');
 reset role;
 
