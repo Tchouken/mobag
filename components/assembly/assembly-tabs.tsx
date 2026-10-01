@@ -12,6 +12,7 @@ export function AssemblyTabs({ basePath }: { basePath: string }) {
     { href: `${basePath}/weight-keys`, label: "Clés de répartition" },
     { href: `${basePath}/members`, label: "Participants" },
     { href: `${basePath}/resolutions`, label: "Résolutions" },
+    { href: `${basePath}/proxies`, label: "Pouvoirs" },
     { href: `${basePath}/staff`, label: "Bureau et accueil" },
   ];
 
