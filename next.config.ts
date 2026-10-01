@@ -12,6 +12,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Import de participants : jusqu'à 20 000 lignes envoyées à la validation.
+    serverActions: { bodySizeLimit: "8mb" },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

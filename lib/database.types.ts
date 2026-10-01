@@ -221,6 +221,111 @@ export type Database = {
           },
         ];
       };
+      member_weights: {
+        Row: {
+          assembly_id: string;
+          member_id: string;
+          weight: number;
+          weight_key_id: string;
+        };
+        Insert: {
+          assembly_id: string;
+          member_id: string;
+          weight: number;
+          weight_key_id: string;
+        };
+        Update: {
+          assembly_id?: string;
+          member_id?: string;
+          weight?: number;
+          weight_key_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "member_weights_member_id_assembly_id_fkey";
+            columns: ["member_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "member_weights_weight_key_id_assembly_id_fkey";
+            columns: ["weight_key_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "weight_key_totals";
+            referencedColumns: ["weight_key_id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "member_weights_weight_key_id_assembly_id_fkey";
+            columns: ["weight_key_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "weight_keys";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
+      members: {
+        Row: {
+          assembly_id: string;
+          company_name: string | null;
+          created_at: string;
+          display_name: string;
+          email: string | null;
+          external_ref: string | null;
+          first_name: string | null;
+          id: string;
+          is_proxy_ineligible: boolean;
+          kind: Database["public"]["Enums"]["member_kind"];
+          last_name: string | null;
+          phone: string | null;
+          representative_name: string | null;
+          updated_at: string;
+          version: number;
+        };
+        Insert: {
+          assembly_id: string;
+          company_name?: string | null;
+          created_at?: string;
+          display_name: string;
+          email?: string | null;
+          external_ref?: string | null;
+          first_name?: string | null;
+          id?: string;
+          is_proxy_ineligible?: boolean;
+          kind: Database["public"]["Enums"]["member_kind"];
+          last_name?: string | null;
+          phone?: string | null;
+          representative_name?: string | null;
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          assembly_id?: string;
+          company_name?: string | null;
+          created_at?: string;
+          display_name?: string;
+          email?: string | null;
+          external_ref?: string | null;
+          first_name?: string | null;
+          id?: string;
+          is_proxy_ineligible?: boolean;
+          kind?: Database["public"]["Enums"]["member_kind"];
+          last_name?: string | null;
+          phone?: string | null;
+          representative_name?: string | null;
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "members_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       org_invitations: {
         Row: {
           accepted_at: string | null;
@@ -488,7 +593,28 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      weight_key_totals: {
+        Row: {
+          assembly_id: string | null;
+          code: string | null;
+          is_primary: boolean | null;
+          label: string | null;
+          members_with_weight: number | null;
+          position: number | null;
+          total_declared: number | null;
+          total_imported: number | null;
+          weight_key_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "weight_keys_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       accept_org_invitation: { Args: { p_token: string }; Returns: string };
@@ -510,8 +636,13 @@ export type Database = {
         Returns: string;
       };
       create_organization: { Args: { p_name: string; p_slug: string }; Returns: string };
+      delete_member: { Args: { p_member: string }; Returns: undefined };
       delete_weight_key: { Args: { p_key: string }; Returns: undefined };
       get_org_invitation: { Args: { p_token: string }; Returns: Json };
+      import_members: {
+        Args: { p_assembly: string; p_dry_run: boolean; p_mode: string; p_rows: Json; p_source?: Json };
+        Returns: Json;
+      };
       invite_org_member: {
         Args: {
           p_email: string;
@@ -558,6 +689,10 @@ export type Database = {
           p_settings: Json;
         };
         Returns: number;
+      };
+      upsert_member: {
+        Args: { p_assembly: string; p_expected_version?: number; p_member: string; p_row: Json };
+        Returns: string;
       };
       upsert_weight_key: {
         Args: {

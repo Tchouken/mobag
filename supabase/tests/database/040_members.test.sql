@@ -1,7 +1,7 @@
 -- Membres : import (validation, tout ou rien, modes, totaux), édition unitaire,
 -- intégrité des voix, isolation, verrouillage et audit.
 begin;
-select plan(49);
+select plan(50);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a2', 'a2@org-a.test'),
@@ -108,6 +108,9 @@ select is((select jsonb_agg(e ->> 'line' order by (e ->> 'line')::int) from json
 select is((select e ->> 'field' from jsonb_array_elements(current_setting('test.r')::jsonb -> 'errors') e
            where e ->> 'line' = '3'), 'weights.voix', 'le champ fautif est indiqué');
 select is((select count(*)::int from public.members), 3, 'tout ou rien : la ligne valide n''est pas importée');
+select is((select count(*)::int from jsonb_array_elements(current_setting('test.r')::jsonb -> 'warnings') w
+           where w ->> 'code' = 'no_voting_rights'), 0,
+  'pas d''avertissement « sans voix » en doublon d''une erreur sur les voix');
 select is(current_setting('test.r')::jsonb ->> 'error_count', '8', 'nombre d''erreurs');
 
 -- Le prénom seul suffit à constituer un nom (pas d'erreur missing_name), mais une ligne vide non.

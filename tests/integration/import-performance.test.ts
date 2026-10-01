@@ -34,12 +34,11 @@ describe("import_members à 20 000 lignes", () => {
         JSON.stringify({ sub: user, role: "authenticated" }),
       ]);
       await db.query("set local role authenticated");
-      const {
-        rows: [{ id: assembly }],
-      } = await db.query<{ id: string }>(
+      const { rows: created } = await db.query<{ id: string }>(
         "select public.create_assembly($1, 'Grande AG', 'ago', 'association', '', '2026-06-01 10:00') as id",
         [org!.id],
       );
+      const assembly = created[0]!.id;
 
       const rows = Array.from({ length: ROWS }, (_, i) => ({
         line: i + 2,

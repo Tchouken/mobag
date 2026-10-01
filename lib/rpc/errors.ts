@@ -36,6 +36,13 @@ const MESSAGES: Record<string, string> = {
   primary_key_required:
     "Une assemblée a toujours une clé principale : désignez-en une autre avant de retirer celle-ci.",
   not_org_member: "Seuls les membres de l'organisation peuvent être désignés.",
+  invalid_import_mode: "Mode d'import inconnu.",
+  invalid_import_rows: "Données d'import invalides.",
+  empty_import: "Le fichier ne contient aucune ligne à importer.",
+  too_many_rows: "Le fichier dépasse 20 000 lignes.",
+  invalid_member: "Les informations du membre sont invalides.",
+  ref_exists: "Cette référence est déjà utilisée par un autre membre de l'assemblée.",
+  weight_key_in_use: "Des membres ont des voix sur cette clé : mettez-les à zéro avant de la supprimer.",
 };
 
 const FALLBACK = "Une erreur inattendue est survenue. Réessayez ou contactez le support.";

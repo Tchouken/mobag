@@ -10,13 +10,14 @@ export function AssemblyTabs({ basePath }: { basePath: string }) {
     { href: basePath, label: "Synthèse" },
     { href: `${basePath}/settings`, label: "Règles" },
     { href: `${basePath}/weight-keys`, label: "Clés de répartition" },
+    { href: `${basePath}/members`, label: "Participants" },
     { href: `${basePath}/staff`, label: "Bureau et accueil" },
   ];
 
   return (
     <nav aria-label="Sections de l'assemblée" className="border-border flex gap-1 overflow-x-auto border-b">
       {tabs.map((tab) => {
-        const active = pathname === tab.href;
+        const active = tab.href === basePath ? pathname === tab.href : pathname.startsWith(tab.href);
         return (
           <Link
             key={tab.href}

@@ -197,7 +197,9 @@ begin
       end if;
       v_weights := v_weights || jsonb_build_object(v_code, v_value);
     end loop;
-    if not exists (select 1 from jsonb_each_text(v_weights) w where w.value::numeric > 0) then
+    -- Pas d'avertissement « sans voix » si les voix de la ligne sont déjà en erreur.
+    if not exists (select 1 from jsonb_each_text(v_weights) w where w.value::numeric > 0)
+       and not exists (select 1 from jsonb_array_elements(v_errors) e where e ->> 'field' like 'weights%') then
       v_warnings := v_warnings || jsonb_build_object('field', 'weights', 'code', 'no_voting_rights');
     end if;
   end if;
