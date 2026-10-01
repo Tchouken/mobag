@@ -18,6 +18,22 @@ cp .env.example .env.local    # puis renseigner les clés affichées par `npx su
 npm run dev
 ```
 
+En local, les e-mails (liens de connexion) sont visibles dans Mailpit : http://127.0.0.1:54324.
+
+## Premier super-admin
+
+Les organisations (clients) sont créées par un super-admin MobilActif. Pour désigner le premier :
+
+1. se connecter une fois sur `/login` avec son adresse, pour que le compte existe ;
+2. exécuter en SQL (éditeur SQL Supabase, ou `psql` en local) :
+
+```sql
+insert into public.platform_admins (user_id)
+select id from auth.users where email = 'prenom.nom@mobilactif.fr';
+```
+
+Les super-admins suivants s'ajoutent de la même façon. Il n'existe volontairement aucune RPC pour cela.
+
 ## Vérifications
 
 ```bash

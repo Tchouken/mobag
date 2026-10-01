@@ -1,20 +1,45 @@
 @import "tailwindcss";
 
+/* Jetons de thème (style shadcn). Contrastes AA visés : public souvent âgé (SPEC §5.8). */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --card: #ffffff;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+  --border: #d4d4d8;
+  --ring: #1d4ed8;
+  --primary: #1e3a8a;
+  --primary-foreground: #ffffff;
+  --destructive: #b91c1c;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --card: #111113;
+    --muted: #1f1f23;
+    --muted-foreground: #a1a1aa;
+    --border: #3f3f46;
+    --ring: #60a5fa;
+    --primary: #93c5fd;
+    --primary-foreground: #0a0a0a;
+    --destructive: #f87171;
   }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
 }
 
 body {

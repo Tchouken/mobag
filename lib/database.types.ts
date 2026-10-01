@@ -1,0 +1,450 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: { extensions?: Json; operationName?: string; query?: string; variables?: Json };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+  public: {
+    Tables: {
+      audit_heads: {
+        Row: {
+          chain_id: string;
+          hash: string;
+          seq: number;
+        };
+        Insert: {
+          chain_id: string;
+          hash: string;
+          seq: number;
+        };
+        Update: {
+          chain_id?: string;
+          hash?: string;
+          seq?: number;
+        };
+        Relationships: [];
+      };
+      audit_log: {
+        Row: {
+          action: string;
+          actor_attendee_id: string | null;
+          actor_user_id: string | null;
+          assembly_id: string | null;
+          at: string;
+          chain_id: string;
+          hash: string;
+          id: number;
+          org_id: string;
+          payload: NonNullable<Json>;
+          prev_hash: string;
+          seq: number;
+        };
+        Insert: {
+          action: string;
+          actor_attendee_id?: string | null;
+          actor_user_id?: string | null;
+          assembly_id?: string | null;
+          at: string;
+          chain_id: string;
+          hash: string;
+          id?: never;
+          org_id: string;
+          payload?: NonNullable<Json>;
+          prev_hash: string;
+          seq: number;
+        };
+        Update: {
+          action?: string;
+          actor_attendee_id?: string | null;
+          actor_user_id?: string | null;
+          assembly_id?: string | null;
+          at?: string;
+          chain_id?: string;
+          hash?: string;
+          id?: never;
+          org_id?: string;
+          payload?: NonNullable<Json>;
+          prev_hash?: string;
+          seq?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      org_invitations: {
+        Row: {
+          accepted_at: string | null;
+          accepted_by: string | null;
+          created_at: string;
+          created_by: string;
+          email: string;
+          expires_at: string;
+          id: string;
+          org_id: string;
+          revoked_at: string | null;
+          role: Database["public"]["Enums"]["org_role"];
+          token_hash: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          accepted_by?: string | null;
+          created_at?: string;
+          created_by: string;
+          email: string;
+          expires_at: string;
+          id?: string;
+          org_id: string;
+          revoked_at?: string | null;
+          role: Database["public"]["Enums"]["org_role"];
+          token_hash: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          accepted_by?: string | null;
+          created_at?: string;
+          created_by?: string;
+          email?: string;
+          expires_at?: string;
+          id?: string;
+          org_id?: string;
+          revoked_at?: string | null;
+          role?: Database["public"]["Enums"]["org_role"];
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "org_invitations_accepted_by_fkey";
+            columns: ["accepted_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "org_invitations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "org_invitations_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      org_members: {
+        Row: {
+          created_at: string;
+          org_id: string;
+          role: Database["public"]["Enums"]["org_role"];
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          org_id: string;
+          role: Database["public"]["Enums"]["org_role"];
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          org_id?: string;
+          role?: Database["public"]["Enums"]["org_role"];
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "org_members_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "org_members_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      organizations: {
+        Row: {
+          branding: NonNullable<Json>;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          name: string;
+          retention_days: number | null;
+          slug: string;
+        };
+        Insert: {
+          branding?: NonNullable<Json>;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name: string;
+          retention_days?: number | null;
+          slug: string;
+        };
+        Update: {
+          branding?: NonNullable<Json>;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          name?: string;
+          retention_days?: number | null;
+          slug?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "organizations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      platform_admins: {
+        Row: {
+          created_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "platform_admins_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          created_at: string;
+          email: string | null;
+          full_name: string | null;
+          id: string;
+        };
+        Insert: {
+          created_at?: string;
+          email?: string | null;
+          full_name?: string | null;
+          id: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string | null;
+          full_name?: string | null;
+          id?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      accept_org_invitation: { Args: { p_token: string }; Returns: string };
+      create_organization: { Args: { p_name: string; p_slug: string }; Returns: string };
+      get_org_invitation: { Args: { p_token: string }; Returns: Json };
+      invite_org_member: {
+        Args: {
+          p_email: string;
+          p_org: string;
+          p_role: Database["public"]["Enums"]["org_role"];
+          p_ttl_days?: number;
+        };
+        Returns: Json;
+      };
+      remove_org_member: { Args: { p_org: string; p_user: string }; Returns: undefined };
+      revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
+      set_org_member_role: {
+        Args: { p_org: string; p_role: Database["public"]["Enums"]["org_role"]; p_user: string };
+        Returns: undefined;
+      };
+      verify_audit_chain: { Args: { p_chain_id: string }; Returns: Json };
+    };
+    Enums: {
+      assembly_mode: "in_person" | "remote" | "hybrid";
+      assembly_status: "draft" | "convened" | "in_session" | "closed" | "archived";
+      assembly_type: "ago" | "age" | "mixed" | "other";
+      attendee_status: "expected" | "present" | "left";
+      ballot_outcome: "adopted" | "rejected" | "no_quorum" | "information";
+      ballot_status: "open" | "closed" | "validated" | "cancelled";
+      cast_channel: "device" | "operator" | "show_of_hands" | "correspondence";
+      member_kind: "person" | "legal_entity";
+      org_role: "org_admin" | "organizer";
+      presence_status: "expected" | "present" | "represented" | "correspondence" | "left" | "absent";
+      proxy_status: "pending" | "active" | "revoked";
+      proxy_type: "named" | "blank" | "temporary";
+      resolution_mode: "electronic" | "show_of_hands" | "mixed";
+      staff_role: "president" | "secretary" | "scrutineer" | "reception";
+      vote_type: "yes_no_abstain" | "multiple_choice" | "election" | "information";
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    keyof (DefaultSchema["Tables"] & DefaultSchema["Views"]) | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    keyof DefaultSchema["CompositeTypes"] | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      assembly_mode: ["in_person", "remote", "hybrid"],
+      assembly_status: ["draft", "convened", "in_session", "closed", "archived"],
+      assembly_type: ["ago", "age", "mixed", "other"],
+      attendee_status: ["expected", "present", "left"],
+      ballot_outcome: ["adopted", "rejected", "no_quorum", "information"],
+      ballot_status: ["open", "closed", "validated", "cancelled"],
+      cast_channel: ["device", "operator", "show_of_hands", "correspondence"],
+      member_kind: ["person", "legal_entity"],
+      org_role: ["org_admin", "organizer"],
+      presence_status: ["expected", "present", "represented", "correspondence", "left", "absent"],
+      proxy_status: ["pending", "active", "revoked"],
+      proxy_type: ["named", "blank", "temporary"],
+      resolution_mode: ["electronic", "show_of_hands", "mixed"],
+      staff_role: ["president", "secretary", "scrutineer", "reception"],
+      vote_type: ["yes_no_abstain", "multiple_choice", "election", "information"],
+    },
+  },
+} as const;
