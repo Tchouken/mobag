@@ -13,6 +13,7 @@ import { rpcErrorMessage } from "@/lib/rpc/errors";
 import { createClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 import { BallotPanel, type BallotActions } from "./ballot-panel";
+import { ProjectionLink } from "./projection-link";
 
 const PROGRESS_MS = 2000;
 
@@ -143,6 +144,9 @@ export function RegieApp({
             <Badge variant="outline" data-testid="live-status">
               {live ? "Temps réel" : "Actualisation toutes les 3 s"}
             </Badge>
+            {isBureau && status !== "archived" && (
+              <ProjectionLink supabase={supabase} assemblyId={assemblyId} />
+            )}
             {isBureau && status === "convened" && (
               <Button
                 size="sm"

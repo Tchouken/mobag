@@ -833,6 +833,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      projection_links: {
+        Row: {
+          assembly_id: string;
+          issued_at: string;
+          issued_by: string | null;
+          token_hash: string;
+        };
+        Insert: {
+          assembly_id: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          token_hash: string;
+        };
+        Update: {
+          assembly_id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "projection_links_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: true;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       proxies: {
         Row: {
           assembly_id: string;
@@ -1541,6 +1570,7 @@ export type Database = {
       my_ballots: { Args: Record<PropertyKey, never>; Returns: Json };
       my_voter_context: { Args: Record<PropertyKey, never>; Returns: Json };
       open_ballot: { Args: { p_duration_seconds?: number; p_resolution: string }; Returns: Json };
+      projection_state: { Args: { p_token: string }; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       reception_snapshot: { Args: { p_assembly: string }; Returns: Json };
       regie_snapshot: { Args: { p_assembly: string }; Returns: Json };
@@ -1558,8 +1588,10 @@ export type Database = {
       };
       return_attendee: { Args: { p_attendee: string; p_expected_version?: number }; Returns: Json };
       revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
+      revoke_projection_token: { Args: { p_assembly: string }; Returns: undefined };
       revoke_proxy: { Args: { p_proxy: string; p_reason?: string }; Returns: undefined };
       revoke_voter_token: { Args: { p_attendee: string; p_reason?: string }; Returns: undefined };
+      rotate_projection_token: { Args: { p_assembly: string }; Returns: string };
       set_assembly_status: {
         Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
         Returns: number;

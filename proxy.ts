@@ -3,7 +3,7 @@ import { updateSession } from "@/lib/supabase/proxy";
 
 // Espaces réservés au personnel (comptes e-mail). Les votants (sessions anonymes, T8)
 // et l'écran de projection ont leurs propres routes.
-const STAFF_PREFIXES = ["/orgs", "/invitations"];
+const STAFF_PREFIXES = ["/orgs", "/invitations", "/accueil", "/regie"];
 
 export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request);

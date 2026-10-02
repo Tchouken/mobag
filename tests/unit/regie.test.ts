@@ -59,3 +59,27 @@ describe("régie", () => {
     expect(countdown(new Date(1_000).toISOString(), 5_000)).toBe("0:00");
   });
 });
+
+describe("projection", () => {
+  it("barres sur un axe commun, parts des exprimés pour et contre", async () => {
+    const { resultBars, readProjectionToken } = await import("@/lib/projection");
+    const bars = resultBars({
+      for: { weight: "6", heads: 3 },
+      against: { weight: 3, heads: 1 },
+      abstain: { weight: 1.5, heads: 1 },
+      expressed: { weight: 9, heads: 4 },
+    });
+    expect(bars.map((b) => b.ratio)).toEqual([1, 0.5, 0.25]);
+    expect(bars.map((b) => b.shareOfExpressed)).toEqual([6 / 9, 3 / 9, null]);
+    expect(
+      resultBars({
+        for: { weight: 0, heads: 0 },
+        against: { weight: 0, heads: 0 },
+        abstain: { weight: 0, heads: 0 },
+        expressed: { weight: 0, heads: 0 },
+      }).every((b) => b.ratio === 0),
+    ).toBe(true);
+    expect(readProjectionToken("#abcd1234abcd1234abcd1234")).toBe("ABCD1234ABCD1234ABCD1234");
+    expect(readProjectionToken("#<script>")).toBeNull();
+  });
+});
