@@ -6,13 +6,16 @@ import { attendancePdf, resultsPdf } from "@/lib/exports/pdf";
 import { attendanceXlsx, resultsCsv, resultsXlsx } from "@/lib/exports/sheets";
 import { exportFileName } from "@/lib/exports/text";
 import { rpcErrorCode } from "@/lib/rpc/errors";
+import { isSameOrigin } from "@/lib/security/same-origin";
 import { createClient } from "@/lib/supabase/server";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Génère un export, le dépose (bucket privé « exports »), l'enregistre avec son empreinte
 // SHA-256 (journal et audit), puis le renvoie en téléchargement. Droits vérifiés par la base.
-export async function GET(request: NextRequest, ctx: RouteContext<"/api/exports/[assemblyId]/[kind]">) {
+// POST depuis l'application seulement : la génération écrit au journal (protection CSRF).
+export async function POST(request: NextRequest, ctx: RouteContext<"/api/exports/[assemblyId]/[kind]">) {
+  if (!isSameOrigin(request)) return new Response("Origine refusée.", { status: 403 });
   const { assemblyId, kind } = await ctx.params;
   const format = request.nextUrl.searchParams.get("format");
   if (!UUID.test(assemblyId) || !isExportRequest(kind, format)) {

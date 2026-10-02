@@ -69,14 +69,33 @@ journal d'audit. Il demande Supabase local démarré (avec Mailpit) et lance l'a
 
 ## Variables d'environnement
 
-| Variable                               | Portée             | Rôle                                                          |
-| -------------------------------------- | ------------------ | ------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`             | publique           | URL du projet Supabase                                        |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publique           | clé publishable (soumise à la RLS)                            |
-| `SUPABASE_SECRET_KEY`                  | serveur uniquement | exports et tâches d'administration ; jamais exposée au client |
+| Variable                               | Portée   | Rôle                                                             |
+| -------------------------------------- | -------- | ---------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | publique | URL du projet Supabase (aussi utilisée par la CSP)               |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publique | clé publishable (soumise à la RLS)                               |
+| `PRODUCTION_HEALTH_URL`                | Vercel   | `https://<domaine>/api/health`, lu par la garde de déploiement   |
+| `DEPLOY_FREEZE_OVERRIDE`               | Vercel   | `1` pour lever le gel des déploiements (correctif urgent, tracé) |
 
-En production, les variables sont gérées dans Vercel.
+L'application n'utilise aucune clé secrète Supabase : toutes les opérations passent par la
+session de l'utilisateur et les RPC.
 
 ## Déploiement
 
-Une preview Vercel est créée par PR. Les migrations Supabase sont versionnées dans `supabase/migrations` et appliquées par la CI.
+- **Vercel** (région `cdg1`, `vercel.json`) : une prévisualisation par PR, la production depuis
+  `main`. Les variables ci-dessus sont à déclarer dans le projet Vercel.
+- **Supabase** (région UE) : `npx supabase link --project-ref <ref>` puis `npx supabase db push`
+  applique les migrations de `supabase/migrations`. Activer dans le projet : sessions anonymes
+  (limite relevée), `pg_cron`, sauvegardes et PITR. URL du site et URL de redirection
+  (`/auth/callback`) à déclarer dans l'authentification.
+- **Gel des déploiements** : pendant une AG (en séance, ou convoquée dans les 12 h), la
+  production n'est pas reconstruite (`scripts/deploy-guard.mjs`, « Ignored Build Step » de Vercel)
+  et le contrôle GitHub « Gel des déploiements » est rouge sur les PR. Passer outre : libellé
+  `gel-leve` sur la PR et `DEPLOY_FREEZE_OVERRIDE=1` sur Vercel.
+
+## Documentation
+
+- `docs/SPEC.md` : cahier des charges (source de vérité) ; `docs/PLAN_LOT1.md` : plan validé.
+- `docs/DECISIONS.md` : réponses aux questions, arbitrages, points ouverts.
+- `docs/ARCHITECTURE.md` : architecture technique.
+- `docs/RUNBOOK_JOUR_J.md` : procédure du jour de l'AG, incidents, mode dégradé.
+- `docs/lots/LOT1_NOTE.md` : bilan du Lot 1 ; `docs/lots/CHARGE_LOT1.md` : tests de charge.

@@ -1626,6 +1626,7 @@ export type Database = {
       my_ballots: { Args: Record<PropertyKey, never>; Returns: Json };
       my_voter_context: { Args: Record<PropertyKey, never>; Returns: Json };
       open_ballot: { Args: { p_duration_seconds?: number; p_resolution: string }; Returns: Json };
+      platform_status: { Args: Record<PropertyKey, never>; Returns: Json };
       projection_state: { Args: { p_token: string }; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       reception_snapshot: { Args: { p_assembly: string }; Returns: Json };

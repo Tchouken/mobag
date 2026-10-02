@@ -18,7 +18,7 @@ export function ExportButton({ href, label }: { href: string; label: string }) {
         onClick={() =>
           startTransition(async () => {
             setResult(undefined);
-            const response = await fetch(href);
+            const response = await fetch(href, { method: "POST" });
             if (!response.ok) {
               setResult({ error: await response.text() });
               return;

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +12,9 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Rendu toujours dynamique : chaque page reçoit le nonce de sa requête (CSP, proxy.ts).
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  await headers();
   return (
     <html lang="fr" className="h-full antialiased">
       <body className="flex min-h-full flex-col">{children}</body>

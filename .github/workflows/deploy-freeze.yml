@@ -1,0 +1,23 @@
+name: Gel des déploiements
+
+# Contrôle de PR vers main : rouge tant qu'une AG est en séance ou imminente en production.
+# Le libellé « gel-leve » passe outre (correctif urgent, décision du responsable de l'AG).
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+jobs:
+  freeze:
+    name: Aucune AG en cours
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: État de la production
+        run: node scripts/deploy-guard.mjs --check
+        env:
+          PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL }}
+          DEPLOY_FREEZE_OVERRIDE: ${{ contains(github.event.pull_request.labels.*.name, 'gel-leve') && '1' || '' }}

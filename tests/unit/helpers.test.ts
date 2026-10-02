@@ -61,3 +61,27 @@ describe("toLocalParts", () => {
     });
   });
 });
+
+describe("CSP", () => {
+  it("n'autorise que les scripts porteurs du nonce et les connexions au projet Supabase", async () => {
+    const { contentSecurityPolicy } = await import("@/lib/security/csp");
+    const csp = contentSecurityPolicy("abc", "https://projet.supabase.co", false);
+    expect(csp).toContain("script-src 'self' 'nonce-abc' 'strict-dynamic';");
+    expect(csp).toContain("connect-src 'self' https://projet.supabase.co wss://projet.supabase.co;");
+    expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).not.toContain("unsafe-eval");
+    expect(contentSecurityPolicy("abc", "http://127.0.0.1:54321", true)).toContain("'unsafe-eval'");
+  });
+});
+
+describe("protection CSRF", () => {
+  it("n'accepte que les requêtes de l'application", async () => {
+    const { isSameOrigin } = await import("@/lib/security/same-origin");
+    const req = (headers: Record<string, string>) =>
+      new Request("https://vote.exemple.fr/api/x", { method: "POST", headers });
+    expect(isSameOrigin(req({ origin: "https://vote.exemple.fr", host: "vote.exemple.fr" }))).toBe(true);
+    expect(isSameOrigin(req({ origin: "https://pirate.exemple", host: "vote.exemple.fr" }))).toBe(false);
+    expect(isSameOrigin(req({ "sec-fetch-site": "cross-site", host: "vote.exemple.fr" }))).toBe(false);
+    expect(isSameOrigin(req({ host: "vote.exemple.fr" }))).toBe(false);
+  });
+});
