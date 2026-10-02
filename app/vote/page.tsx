@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatWeight } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import { LiveRefresh } from "./live-refresh";
 import { ReleaseDevice } from "./release-device";
 
 export const metadata: Metadata = { title: "Vote" };
@@ -22,6 +23,11 @@ export default async function VotePage() {
   const { data } = await supabase.rpc("my_voter_context");
   const context = data as unknown as VoterContext | null;
   if (!context) redirect("/v");
+  const { data: ballotsData } = await supabase.rpc("my_ballots");
+  const ballots = (ballotsData ?? []) as {
+    ballot_id: string;
+    resolution: { number: string; title: string };
+  }[];
 
   const own = context.portfolio.members.filter((m) => m.via === "own");
   const proxies = context.portfolio.members.filter((m) => m.via === "proxy");
@@ -34,11 +40,21 @@ export default async function VotePage() {
       </header>
 
       <div role="status" className="border-border bg-muted rounded-lg border p-6 text-center">
-        <p className="text-xl font-medium">Aucun vote en cours</p>
-        <p className="text-muted-foreground mt-2 text-base">
-          Gardez cette page ouverte : la prochaine résolution s&apos;affichera ici dès l&apos;ouverture du
-          vote.
-        </p>
+        {ballots.length > 0 ? (
+          ballots.map((b) => (
+            <p key={b.ballot_id} className="text-xl font-medium">
+              Vote en cours : résolution {b.resolution.number} — {b.resolution.title}
+            </p>
+          ))
+        ) : (
+          <>
+            <p className="text-xl font-medium">Aucun vote en cours</p>
+            <p className="text-muted-foreground mt-2 text-base">
+              Gardez cette page ouverte : la prochaine résolution s&apos;affichera ici dès l&apos;ouverture du
+              vote.
+            </p>
+          </>
+        )}
       </div>
 
       <Card>
@@ -64,6 +80,7 @@ export default async function VotePage() {
       </Card>
 
       <ReleaseDevice loaned={context.device.kind === "loaned"} />
+      <LiveRefresh assemblyId={context.assembly.id} />
     </main>
   );
 }

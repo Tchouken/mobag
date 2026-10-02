@@ -17,7 +17,7 @@ fi
 if ! npx supabase status >/dev/null 2>&1; then
   echo "Démarrage de Supabase…"
   npx supabase stop --no-backup >/dev/null 2>&1 || true
-  npx supabase start -x studio,vector,logflare,edge-runtime,supavisor,postgres-meta,realtime
+  npx supabase start -x studio,vector,logflare,edge-runtime,supavisor,postgres-meta
 fi
 
 if [[ "${1:-}" == "--app" ]] && ! curl -s -o /dev/null http://localhost:3000/login; then

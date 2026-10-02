@@ -1,18 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatWeight } from "@/lib/format";
+import { useAssemblyChannel } from "@/lib/realtime/use-assembly-channel";
 import { buildEntries, PRESENCE_LABELS, searchEntries, type ReceptionSnapshot } from "@/lib/reception/model";
 import { createClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 import { ReceptionContext, type ReceptionContextValue } from "./context";
 import { PersonPanel } from "./person-panel";
 
-const POLL_MS = 5000;
 const NEW_PERSON = "new";
 
 const percent = (part: number, total: number) =>
@@ -21,8 +21,8 @@ const percent = (part: number, total: number) =>
     : "—";
 
 // Écran d'accueil (tablette) : recherche instantanée à gauche, fiche de la personne à droite,
-// quorum en tête. L'instantané est relu toutes les 5 s et après chaque action (plusieurs postes
-// d'accueil travaillent en parallèle ; les conflits sont arbitrés par la base).
+// quorum en tête. L'instantané est relu à chaque signal temps réel (ou toutes les 3 s si le canal
+// est indisponible) et après chaque action ; les conflits entre postes sont arbitrés par la base.
 export function ReceptionApp({
   initial,
   isBureau,
@@ -45,12 +45,7 @@ export function ReceptionApp({
     if (data) setSnapshot(data as ReceptionSnapshot);
   }, [supabase, assemblyId]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (!document.hidden) void refresh();
-    }, POLL_MS);
-    return () => clearInterval(timer);
-  }, [refresh]);
+  const live = useAssemblyChannel(supabase, assemblyId, "staff", () => void refresh());
 
   const entries = useMemo(() => buildEntries(snapshot), [snapshot]);
   const results = useMemo(() => searchEntries(entries, query), [entries, query]);
@@ -88,7 +83,13 @@ export function ReceptionApp({
           ) : (
             <Badge variant="secondary">Pas de quorum requis</Badge>
           )}
-          {offline && <Badge variant="warning">Connexion perdue : nouvel essai…</Badge>}
+          {offline ? (
+            <Badge variant="warning">Connexion perdue : nouvel essai…</Badge>
+          ) : (
+            <Badge variant="outline" data-testid="live-status">
+              {live ? "Temps réel" : "Actualisation toutes les 3 s"}
+            </Badge>
+          )}
         </div>
       </header>
 
