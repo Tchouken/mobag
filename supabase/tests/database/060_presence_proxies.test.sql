@@ -136,7 +136,12 @@ select public.set_assembly_status(pg_temp.ag(), 'convened', null);
 
 select throws_ok($$ select public.check_in(pg_temp.ag(), pg_temp.att('Alice'), null, null, 99) $$,
   'P0001', 'version_conflict', 'émargement : version périmée refusée (deux postes d''accueil)');
-select is((public.check_in(pg_temp.ag(), pg_temp.att('Alice'), null, pg_temp.ag()::text || '/sig.png') -> 'totals' -> 0 ->> 'weight')::numeric,
+-- Signature déposée dans le dossier d'Alice (dépôt direct, hors RLS, pour le test).
+reset role;
+select set_config('test.sig', pg_temp.ag()::text || '/' || pg_temp.att('Alice')::text || '/signature.png', true);
+insert into storage.objects (bucket_id, name, metadata) values ('signatures', current_setting('test.sig'), '{"size": 100}');
+select pg_temp.login('00000000-0000-0000-0000-0000000000a2');
+select is((public.check_in(pg_temp.ag(), pg_temp.att('Alice'), null, current_setting('test.sig')) -> 'totals' -> 0 ->> 'weight')::numeric,
   500.0, 'Alice émarge : 100 propres + 50 + 150 + 200 par pouvoirs');
 select results_eq($$ select pg_temp.st('A'), pg_temp.st('B'), pg_temp.st('C'), pg_temp.st('E') $$,
   $$ values ('present:Alice', 'represented:Alice', 'represented:Alice', 'represented:Alice') $$,

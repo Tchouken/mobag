@@ -1238,6 +1238,7 @@ export type Database = {
       };
       my_voter_context: { Args: Record<PropertyKey, never>; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
+      reception_snapshot: { Args: { p_assembly: string }; Returns: Json };
       release_voter_device: { Args: Record<PropertyKey, never>; Returns: undefined };
       remove_assembly_staff: {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
