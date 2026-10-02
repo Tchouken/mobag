@@ -358,6 +358,142 @@ export type Database = {
           },
         ];
       };
+      ballot_eligibility: {
+        Row: {
+          assembly_id: string;
+          auto_choice: string | null;
+          ballot_id: string;
+          holder_attendee_id: string | null;
+          holder_changed_at: string | null;
+          member_id: string;
+          presence_status: Database["public"]["Enums"]["presence_status"];
+          via_proxy_id: string | null;
+          weight: number;
+        };
+        Insert: {
+          assembly_id: string;
+          auto_choice?: string | null;
+          ballot_id: string;
+          holder_attendee_id?: string | null;
+          holder_changed_at?: string | null;
+          member_id: string;
+          presence_status: Database["public"]["Enums"]["presence_status"];
+          via_proxy_id?: string | null;
+          weight: number;
+        };
+        Update: {
+          assembly_id?: string;
+          auto_choice?: string | null;
+          ballot_id?: string;
+          holder_attendee_id?: string | null;
+          holder_changed_at?: string | null;
+          member_id?: string;
+          presence_status?: Database["public"]["Enums"]["presence_status"];
+          via_proxy_id?: string | null;
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ballot_eligibility_ballot_id_assembly_id_fkey";
+            columns: ["ballot_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "ballots";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "ballot_eligibility_holder_attendee_id_assembly_id_fkey";
+            columns: ["holder_attendee_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id", "assembly_id"];
+          },
+          {
+            foreignKeyName: "ballot_eligibility_member_id_assembly_id_fkey";
+            columns: ["member_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "members";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
+      ballots: {
+        Row: {
+          assembly_id: string;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          cancelled_reason: string | null;
+          closed_at: string | null;
+          closed_by: string | null;
+          closes_at: string | null;
+          id: string;
+          opened_at: string;
+          opened_by: string | null;
+          resolution_id: string;
+          round: number;
+          rules_snapshot: NonNullable<Json>;
+          status: Database["public"]["Enums"]["ballot_status"];
+          totals: NonNullable<Json>;
+          validated_at: string | null;
+          validated_by: string | null;
+          votes_digest: string | null;
+        };
+        Insert: {
+          assembly_id: string;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          cancelled_reason?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          closes_at?: string | null;
+          id?: string;
+          opened_at?: string;
+          opened_by?: string | null;
+          resolution_id: string;
+          round?: number;
+          rules_snapshot: NonNullable<Json>;
+          status?: Database["public"]["Enums"]["ballot_status"];
+          totals?: NonNullable<Json>;
+          validated_at?: string | null;
+          validated_by?: string | null;
+          votes_digest?: string | null;
+        };
+        Update: {
+          assembly_id?: string;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          cancelled_reason?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          closes_at?: string | null;
+          id?: string;
+          opened_at?: string;
+          opened_by?: string | null;
+          resolution_id?: string;
+          round?: number;
+          rules_snapshot?: NonNullable<Json>;
+          status?: Database["public"]["Enums"]["ballot_status"];
+          totals?: NonNullable<Json>;
+          validated_at?: string | null;
+          validated_by?: string | null;
+          votes_digest?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ballots_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ballots_resolution_id_assembly_id_fkey";
+            columns: ["resolution_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "resolutions";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
       member_presence: {
         Row: {
           assembly_id: string;
@@ -972,6 +1108,41 @@ export type Database = {
           },
         ];
       };
+      results: {
+        Row: {
+          assembly_id: string;
+          ballot_id: string;
+          computed_at: string;
+          evaluation: NonNullable<Json>;
+          outcome: Database["public"]["Enums"]["ballot_outcome"];
+          tallies: NonNullable<Json>;
+        };
+        Insert: {
+          assembly_id: string;
+          ballot_id: string;
+          computed_at?: string;
+          evaluation: NonNullable<Json>;
+          outcome: Database["public"]["Enums"]["ballot_outcome"];
+          tallies: NonNullable<Json>;
+        };
+        Update: {
+          assembly_id?: string;
+          ballot_id?: string;
+          computed_at?: string;
+          evaluation?: NonNullable<Json>;
+          outcome?: Database["public"]["Enums"]["ballot_outcome"];
+          tallies?: NonNullable<Json>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "results_ballot_id_assembly_id_fkey";
+            columns: ["ballot_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "ballots";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
       rule_presets: {
         Row: {
           abstention_policy: string | null;
@@ -1011,6 +1182,72 @@ export type Database = {
           params?: NonNullable<Json>;
           position?: number;
           validated_by_lawyer?: boolean;
+        };
+        Relationships: [];
+      };
+      vote_events: {
+        Row: {
+          at: string;
+          ballot_id: string;
+          cast_by_attendee_id: string | null;
+          cast_by_user_id: string | null;
+          channel: Database["public"]["Enums"]["cast_channel"];
+          choice: string;
+          id: number;
+          idempotency_key: string | null;
+          member_id: string;
+          revision: number;
+          weight: number;
+        };
+        Insert: {
+          at: string;
+          ballot_id: string;
+          cast_by_attendee_id?: string | null;
+          cast_by_user_id?: string | null;
+          channel: Database["public"]["Enums"]["cast_channel"];
+          choice: string;
+          id?: never;
+          idempotency_key?: string | null;
+          member_id: string;
+          revision: number;
+          weight: number;
+        };
+        Update: {
+          at?: string;
+          ballot_id?: string;
+          cast_by_attendee_id?: string | null;
+          cast_by_user_id?: string | null;
+          channel?: Database["public"]["Enums"]["cast_channel"];
+          choice?: string;
+          id?: never;
+          idempotency_key?: string | null;
+          member_id?: string;
+          revision?: number;
+          weight?: number;
+        };
+        Relationships: [];
+      };
+      vote_requests: {
+        Row: {
+          attendee_id: string;
+          ballot_id: string;
+          created_at: string;
+          idempotency_key: string;
+          response: Json | null;
+        };
+        Insert: {
+          attendee_id: string;
+          ballot_id: string;
+          created_at?: string;
+          idempotency_key: string;
+          response?: Json | null;
+        };
+        Update: {
+          attendee_id?: string;
+          ballot_id?: string;
+          created_at?: string;
+          idempotency_key?: string;
+          response?: Json | null;
         };
         Relationships: [];
       };
@@ -1074,6 +1311,59 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "attendees";
             referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
+      votes: {
+        Row: {
+          assembly_id: string;
+          ballot_id: string;
+          cast_at: string;
+          cast_by_attendee_id: string | null;
+          cast_by_user_id: string | null;
+          channel: Database["public"]["Enums"]["cast_channel"];
+          choice: string;
+          id: number;
+          idempotency_key: string | null;
+          member_id: string;
+          revision: number;
+          weight: number;
+        };
+        Insert: {
+          assembly_id: string;
+          ballot_id: string;
+          cast_at?: string;
+          cast_by_attendee_id?: string | null;
+          cast_by_user_id?: string | null;
+          channel: Database["public"]["Enums"]["cast_channel"];
+          choice: string;
+          id?: never;
+          idempotency_key?: string | null;
+          member_id: string;
+          revision?: number;
+          weight: number;
+        };
+        Update: {
+          assembly_id?: string;
+          ballot_id?: string;
+          cast_at?: string;
+          cast_by_attendee_id?: string | null;
+          cast_by_user_id?: string | null;
+          channel?: Database["public"]["Enums"]["cast_channel"];
+          choice?: string;
+          id?: never;
+          idempotency_key?: string | null;
+          member_id?: string;
+          revision?: number;
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "votes_ballot_id_member_id_fkey";
+            columns: ["ballot_id", "member_id"];
+            isOneToOne: true;
+            referencedRelation: "ballot_eligibility";
+            referencedColumns: ["ballot_id", "member_id"];
           },
         ];
       };
@@ -1154,6 +1444,9 @@ export type Database = {
         Returns: undefined;
       };
       attendee_portfolio: { Args: { p_attendee: string }; Returns: Json };
+      ballot_progress: { Args: { p_ballot: string }; Returns: Json };
+      cancel_ballot: { Args: { p_ballot: string; p_reason: string }; Returns: undefined };
+      cast_votes: { Args: { p_ballot: string; p_idempotency_key: string; p_items: Json }; Returns: Json };
       check_in: {
         Args: {
           p_assembly: string;
@@ -1175,6 +1468,7 @@ export type Database = {
         Returns: Json;
       };
       claim_voter_token: { Args: { p_code: string }; Returns: Json };
+      close_ballot: { Args: { p_ballot: string }; Returns: Json };
       create_assembly: {
         Args: {
           p_legal_family: string;
@@ -1236,7 +1530,9 @@ export type Database = {
         Args: { p_attendee: string; p_device_label?: string; p_kind: string };
         Returns: Json;
       };
+      my_ballots: { Args: Record<PropertyKey, never>; Returns: Json };
       my_voter_context: { Args: Record<PropertyKey, never>; Returns: Json };
+      open_ballot: { Args: { p_duration_seconds?: number; p_resolution: string }; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       reception_snapshot: { Args: { p_assembly: string }; Returns: Json };
       release_voter_device: { Args: Record<PropertyKey, never>; Returns: undefined };
@@ -1326,6 +1622,7 @@ export type Database = {
         };
         Returns: string;
       };
+      validate_result: { Args: { p_ballot: string }; Returns: Json };
       verify_audit_chain: { Args: { p_chain_id: string }; Returns: Json };
     };
     Enums: {

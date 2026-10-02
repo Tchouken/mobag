@@ -80,6 +80,23 @@ const MESSAGES: Record<string, string> = {
   invalid_token_kind: "Type d'appareil inconnu.",
   no_active_token: "Aucun appareil de vote n'est associé à cette personne.",
   invalid_reason: "Motif invalide.",
+  vote_mode_not_available: "Seul le vote électronique est disponible pour l'instant.",
+  invalid_duration: "La durée du vote doit être comprise entre 10 secondes et 24 heures.",
+  ballot_exists: "Cette résolution a déjà été mise au vote.",
+  ballot_already_open: "Un autre vote est déjà ouvert : clôturez-le d'abord.",
+  board_recommendation_required:
+    "Indiquez l'avis du conseil sur cette résolution : il fixe le vote des pouvoirs en blanc.",
+  ballot_not_open: "Le vote est clos.",
+  ballot_not_closed: "Le vote doit être clos (et non encore validé) pour cette action.",
+  ballot_not_cancellable: "Un résultat validé ne peut plus être annulé.",
+  ballot_open: "Un vote est encore ouvert : clôturez-le avant de clore la séance.",
+  president_only: "Seul le président de séance peut valider un résultat.",
+  invalid_request: "Envoi invalide. Rechargez la page et recommencez.",
+  rate_limited: "Trop d'envois en peu de temps : patientez quelques secondes.",
+  invalid_choice: "Choix de vote invalide.",
+  cancel_reason_required: "Indiquez le motif de l'annulation du vote.",
+  member_not_held: "Vous ne détenez pas (ou plus) ces voix pour ce vote.",
+  vote_already_cast: "Votre vote est déjà enregistré et ne peut pas être modifié sur cette résolution.",
 };
 
 const FALLBACK = "Une erreur inattendue est survenue. Réessayez ou contactez le support.";
