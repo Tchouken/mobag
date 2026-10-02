@@ -42,3 +42,8 @@ next-env.d.ts
 
 # exemple d’environnement versionné
 !.env.example
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/

@@ -36,12 +36,36 @@ select id from auth.users where email = 'prenom.nom@mobilactif.fr';
 
 Les super-admins suivants s'ajoutent de la même façon. Il n'existe volontairement aucune RPC pour cela.
 
+## Données de démonstration
+
+```bash
+npx supabase db reset   # base vierge
+npm run db:demo         # organisation de démonstration, trois AG convoquées
+```
+
+Connexion avec `demo@mobag.local` (lien dans Mailpit). La démonstration contient :
+
+- **Société Démo SA** : 40 actionnaires, président désigné, pouvoirs en blanc votés selon l'avis du conseil ;
+- **Association Démo** : 1 500 adhérents, quorum d'un quart, 60 mandataires portant chacun 2 pouvoirs ;
+- **Résidence Les Tilleuls** : copropriété de 120 lots, 3 clés (charges générales, ascenseur, bâtiment B),
+  majorités des articles 24, 25 et 26, plafond de pouvoirs « 3 OU 10 % », syndic non éligible mandataire.
+
+Le compte de démonstration est président, secrétaire et agent d'accueil des trois AG : accueil, régie et
+projection sont utilisables tout de suite.
+
 ## Vérifications
 
 ```bash
 npm run lint && npm run typecheck && npm test   # application
 npm run db:test                                 # tests pgTAP des fonctions SQL
+npm run test:integration                        # concurrence, import massif (base locale)
+npm run test:e2e                                # parcours complet dans le navigateur (Playwright)
 ```
+
+Le parcours de bout en bout (`e2e/assembly-journey.spec.ts`) passe uniquement par l'interface : création
+de l'AG, import, résolution, pouvoir, bureau, convocation, émargements signés, appareils de vote, départ
+avec transmission, régie, votes sur deux smartphones, résultat validé, projection, exports, intégrité du
+journal d'audit. Il demande Supabase local démarré (avec Mailpit) et lance l'application au besoin.
 
 ## Variables d'environnement
 
