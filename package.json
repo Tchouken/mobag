@@ -18,7 +18,10 @@
     "db:types": "supabase gen types typescript --local > lib/database.types.ts && prettier --write lib/database.types.ts",
     "test:integration": "vitest run tests/integration",
     "db:demo": "psql \"${DATABASE_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}\" -f supabase/seed/demo.sql",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "load:prepare": "node load-tests/prepare.mjs --voters 2000",
+    "load:run": "k6 run load-tests/open-ballot-burst.js",
+    "load:verify": "node load-tests/verify.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -2,7 +2,7 @@
 -- modification, départ pendant un scrutin (5.6.4, B2), clôture scellée, résultat, validation,
 -- minuteur, annulation, pouvoirs en blanc selon l'avis du conseil (B7), secret des votes.
 begin;
-select plan(66);
+select plan(67);
 
 insert into auth.users (id, email, is_anonymous) values
   ('00000000-0000-0000-0000-0000000000a2', 'a2@org-a.test', false),   -- organisatrice (hors bureau)
@@ -118,6 +118,7 @@ select pg_temp.login('00000000-0000-0000-0000-0000000000f1');
 select public.claim_voter_token(current_setting('test.code_Alice'));
 select is(jsonb_array_length(public.my_ballots() -> 0 -> 'members'), 2, 'Alice voit ses voix et le pouvoir de Delta');
 select is(public.my_ballots() -> 0 -> 'resolution' ->> 'title', 'Comptes', 'Alice voit la résolution');
+select is(public.my_voter_context() -> 'ballots', public.my_ballots(), 'le contexte de l''appareil inclut les scrutins ouverts');
 select set_config('test.first', public.cast_votes(pg_temp.b('b1'), pg_temp.items('A', 'against', 'D', 'against'),
   'cccccccc-0000-0000-0000-000000000001')::text, true);
 select is(current_setting('test.first')::jsonb ->> 'count', '2', 'vote pour soi et pour son mandant en un envoi');

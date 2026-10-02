@@ -19,6 +19,8 @@ type VoterContext = {
     members: { member_id: string; display_name: string; via: "own" | "proxy" }[];
     totals: { code: string; label: string; weight: number }[];
   };
+  // Scrutins ouverts, lus dans le même appel (une requête par écran à l'ouverture d'un vote).
+  ballots: (OpenBallot & { resolution: { body: unknown } })[];
 };
 
 export default async function VotePage() {
@@ -26,8 +28,7 @@ export default async function VotePage() {
   const { data } = await supabase.rpc("my_voter_context");
   const context = data as unknown as VoterContext | null;
   if (!context) redirect("/v");
-  const { data: ballotsData } = await supabase.rpc("my_ballots");
-  const ballots = (ballotsData ?? []) as unknown as (OpenBallot & { resolution: { body: unknown } })[];
+  const ballots = context.ballots ?? [];
 
   const own = context.portfolio.members.filter((m) => m.via === "own");
   const proxies = context.portfolio.members.filter((m) => m.via === "proxy");
