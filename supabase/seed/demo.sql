@@ -5,11 +5,18 @@
 --     majorité des articles 24, 25 et 26 (à valider juridiquement), plafond de pouvoirs 3 OU 10 % ;
 --   · Association Démo — AG : 1 500 adhérents, quorum d'un quart, 2 pouvoirs par mandataire.
 -- Tout passe par les RPC (mêmes contrôles, même journal d'audit qu'en usage réel). Données
--- déterministes. Connexion : demo@mobag.local (lien magique, voir Mailpit en local).
+-- déterministes.
 --
--- Usage : npm run db:demo   (sur une base réinitialisée : npx supabase db reset)
+-- Compte : par défaut demo@mobag.local (lien magique visible dans Mailpit, en local). Sur un
+-- projet hébergé, passer sa propre adresse (le compte est créé s'il n'existe pas encore) :
+--   npm run db:demo                                              (local)
+--   psql "<chaîne de connexion>" -v email=prenom.nom@exemple.fr -f supabase/seed/demo.sql
 
 \set ON_ERROR_STOP on
+\if :{?email}
+\else
+  \set email demo@mobag.local
+\endif
 \set QUIET on
 \o /dev/null
 begin;
@@ -22,19 +29,21 @@ begin
 end;
 $$;
 
--- ===== Compte de démonstration =====
+-- ===== Compte de démonstration (créé s'il n'existe pas) =====
 insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_user_meta_data,
                         confirmation_token, recovery_token, email_change_token_new, email_change, created_at, updated_at)
-values ('00000000-0000-0000-0000-000000000000', 'd0000000-0000-4000-8000-000000000001', 'authenticated',
-        'authenticated', 'demo@mobag.local', now(), '{"full_name": "Camille Démo"}', '', '', '', '', now(), now());
+select '00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated', lower(:'email'),
+       now(), '{"full_name": "Compte de démonstration"}', '', '', '', '', now(), now()
+where not exists (select 1 from auth.users where email = lower(:'email'));
+select set_config('demo.user', (select id from auth.users where email = lower(:'email') limit 1)::text, true);
 
 insert into public.organizations (id, name, slug)
 values ('d0000000-0000-4000-8000-0000000000aa', 'MobilActif — Démonstration', 'demo-mobilactif');
 insert into public.org_members (org_id, user_id, role)
-values ('d0000000-0000-4000-8000-0000000000aa', 'd0000000-0000-4000-8000-000000000001', 'org_admin');
+values ('d0000000-0000-4000-8000-0000000000aa', current_setting('demo.user')::uuid, 'org_admin');
 
 select set_config('request.jwt.claims',
-  '{"sub": "d0000000-0000-4000-8000-000000000001", "role": "authenticated"}', true);
+  json_build_object('sub', current_setting('demo.user'), 'role', 'authenticated')::text, true);
 
 -- ===== Outils =====
 create function pg_temp.name(i int) returns jsonb language sql immutable as $$
@@ -74,7 +83,7 @@ create function pg_temp.attendee(p_assembly uuid, p_ref text) returns uuid langu
   from public.members m where m.assembly_id = p_assembly and m.external_ref = p_ref $$;
 
 create function pg_temp.staff(p_assembly uuid) returns void language sql as $$
-  select public.assign_assembly_staff(p_assembly, 'd0000000-0000-4000-8000-000000000001', r)
+  select public.assign_assembly_staff(p_assembly, current_setting('demo.user')::uuid, r)
   from unnest(array['president', 'secretary', 'reception']::public.staff_role[]) r $$;
 
 -- ===== 1. Société Démo SA — AGO (priorité 1 : sociétés) =====

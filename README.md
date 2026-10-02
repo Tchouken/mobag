@@ -43,7 +43,14 @@ npx supabase db reset   # base vierge
 npm run db:demo         # organisation de démonstration, trois AG convoquées
 ```
 
-Connexion avec `demo@mobag.local` (lien dans Mailpit). La démonstration contient :
+Connexion avec `demo@mobag.local` (lien dans Mailpit). Sur un projet Supabase hébergé, où
+Mailpit n'existe pas, utiliser sa propre adresse :
+
+```bash
+psql "<chaîne de connexion du projet>" -v email=prenom.nom@exemple.fr -f supabase/seed/demo.sql
+```
+
+La démonstration contient :
 
 - **Société Démo SA** : 40 actionnaires, président désigné, pouvoirs en blanc votés selon l'avis du conseil ;
 - **Association Démo** : 1 500 adhérents, quorum d'un quart, 60 mandataires portant chacun 2 pouvoirs ;
