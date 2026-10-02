@@ -1014,6 +1014,69 @@ export type Database = {
         };
         Relationships: [];
       };
+      voter_tokens: {
+        Row: {
+          assembly_id: string;
+          attendee_id: string;
+          claimed_at: string | null;
+          claimed_by: string | null;
+          device_label: string | null;
+          expires_at: string;
+          id: string;
+          issued_at: string;
+          issued_by: string | null;
+          kind: string;
+          revoked_at: string | null;
+          revoked_reason: string | null;
+          token_hash: string;
+        };
+        Insert: {
+          assembly_id: string;
+          attendee_id: string;
+          claimed_at?: string | null;
+          claimed_by?: string | null;
+          device_label?: string | null;
+          expires_at: string;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind: string;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+          token_hash: string;
+        };
+        Update: {
+          assembly_id?: string;
+          attendee_id?: string;
+          claimed_at?: string | null;
+          claimed_by?: string | null;
+          device_label?: string | null;
+          expires_at?: string;
+          id?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          kind?: string;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "voter_tokens_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voter_tokens_attendee_id_assembly_id_fkey";
+            columns: ["attendee_id", "assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id", "assembly_id"];
+          },
+        ];
+      };
       weight_keys: {
         Row: {
           assembly_id: string;
@@ -1111,6 +1174,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      claim_voter_token: { Args: { p_code: string }; Returns: Json };
       create_assembly: {
         Args: {
           p_legal_family: string;
@@ -1168,7 +1232,13 @@ export type Database = {
         };
         Returns: Json;
       };
+      issue_voter_token: {
+        Args: { p_attendee: string; p_device_label?: string; p_kind: string };
+        Returns: Json;
+      };
+      my_voter_context: { Args: Record<PropertyKey, never>; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
+      release_voter_device: { Args: Record<PropertyKey, never>; Returns: undefined };
       remove_assembly_staff: {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
         Returns: undefined;
@@ -1182,6 +1252,7 @@ export type Database = {
       return_attendee: { Args: { p_attendee: string; p_expected_version?: number }; Returns: Json };
       revoke_org_invitation: { Args: { p_invitation: string }; Returns: undefined };
       revoke_proxy: { Args: { p_proxy: string; p_reason?: string }; Returns: undefined };
+      revoke_voter_token: { Args: { p_attendee: string; p_reason?: string }; Returns: undefined };
       set_assembly_status: {
         Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
         Returns: number;

@@ -6,6 +6,10 @@ cd "$(dirname "$0")/.."
 
 if ! docker info >/dev/null 2>&1; then
   echo "Démarrage du démon Docker…"
+  # Après recyclage du conteneur, le fichier PID peut désigner un autre processus.
+  if [[ -f /var/run/docker.pid ]] && ! grep -qs dockerd "/proc/$(cat /var/run/docker.pid)/comm"; then
+    rm -f /var/run/docker.pid /var/run/docker.sock
+  fi
   (nohup dockerd >/tmp/dockerd.log 2>&1 &)
   for _ in $(seq 1 30); do docker info >/dev/null 2>&1 && break; sleep 2; done
 fi
