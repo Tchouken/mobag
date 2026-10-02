@@ -14,6 +14,7 @@ export function AssemblyTabs({ basePath }: { basePath: string }) {
     { href: `${basePath}/resolutions`, label: "Résolutions" },
     { href: `${basePath}/proxies`, label: "Pouvoirs" },
     { href: `${basePath}/staff`, label: "Bureau et accueil" },
+    { href: `${basePath}/exports`, label: "Exports" },
   ];
 
   return (

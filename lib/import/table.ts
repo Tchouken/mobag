@@ -61,6 +61,8 @@ export function normalizeHeader(raw: string): string {
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
+    .replace(/œ/g, "oe")
+    .replace(/æ/g, "ae")
     .replace(/[°º#.:_\-/()'’]/g, " ")
     .replace(/\s+/g, " ")
     .trim();

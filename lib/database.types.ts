@@ -494,6 +494,60 @@ export type Database = {
           },
         ];
       };
+      exports: {
+        Row: {
+          assembly_id: string;
+          assembly_status: Database["public"]["Enums"]["assembly_status"];
+          created_at: string;
+          created_by: string | null;
+          format: string;
+          id: string;
+          kind: string;
+          path: string;
+          sha256: string;
+          size_bytes: number;
+        };
+        Insert: {
+          assembly_id: string;
+          assembly_status: Database["public"]["Enums"]["assembly_status"];
+          created_at?: string;
+          created_by?: string | null;
+          format: string;
+          id?: string;
+          kind: string;
+          path: string;
+          sha256: string;
+          size_bytes: number;
+        };
+        Update: {
+          assembly_id?: string;
+          assembly_status?: Database["public"]["Enums"]["assembly_status"];
+          created_at?: string;
+          created_by?: string | null;
+          format?: string;
+          id?: string;
+          kind?: string;
+          path?: string;
+          sha256?: string;
+          size_bytes?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exports_assembly_id_fkey";
+            columns: ["assembly_id"];
+            isOneToOne: false;
+            referencedRelation: "assemblies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exports_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       member_presence: {
         Row: {
           assembly_id: string;
@@ -1524,6 +1578,8 @@ export type Database = {
       delete_member: { Args: { p_member: string }; Returns: undefined };
       delete_resolution: { Args: { p_reason?: string; p_resolution: string }; Returns: undefined };
       delete_weight_key: { Args: { p_key: string }; Returns: undefined };
+      export_attendance_data: { Args: { p_assembly: string }; Returns: Json };
+      export_results_data: { Args: { p_assembly: string }; Returns: Json };
       get_org_invitation: { Args: { p_token: string }; Returns: Json };
       grant_proxy: {
         Args: {
@@ -1573,6 +1629,17 @@ export type Database = {
       projection_state: { Args: { p_token: string }; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       reception_snapshot: { Args: { p_assembly: string }; Returns: Json };
+      record_export: {
+        Args: {
+          p_assembly: string;
+          p_format: string;
+          p_kind: string;
+          p_path: string;
+          p_sha256: string;
+          p_size: number;
+        };
+        Returns: string;
+      };
       regie_snapshot: { Args: { p_assembly: string }; Returns: Json };
       release_voter_device: { Args: Record<PropertyKey, never>; Returns: undefined };
       remind_voters: { Args: { p_ballot: string }; Returns: number };

@@ -108,6 +108,13 @@ describe("accueil : recherche", () => {
   });
 });
 
+describe("accueil : recherche avec ligatures", () => {
+  it("« oeuvre » trouve « Œuvre »", async () => {
+    const { normalizeHeader } = await import("@/lib/import/table");
+    expect(normalizeHeader("SCI Œuvre Æther")).toBe("sci oeuvre aether");
+  });
+});
+
 describe("accueil : règles d'affichage", () => {
   it("propose le représentant d'une personne morale", () => {
     expect(defaultAttendeeName(snapshot.members[1]!)).toBe("Paul Martin");
