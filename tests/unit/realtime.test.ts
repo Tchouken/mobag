@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { connectLive, topicFor, type ChannelStatus } from "@/lib/realtime/live";
 
 function fakeChannel() {
-  let signal: () => void = () => {};
+  let signal: (event: string) => void = () => {};
   let status: (s: ChannelStatus) => void = () => {};
   return {
     channel: {
-      onSignal: (h: () => void) => (signal = h),
+      onSignal: (h: (event: string) => void) => (signal = h),
       subscribe: (h: (s: ChannelStatus) => void) => (status = h),
       unsubscribe: vi.fn(),
     },
-    signal: () => signal(),
+    signal: (event = "presence") => signal(event),
     status: (s: ChannelStatus) => status(s),
   };
 }
@@ -52,6 +52,14 @@ describe("temps réel : canal et repli", () => {
     fake.signal();
     vi.advanceTimersByTime(250);
     expect(refresh).toHaveBeenCalledTimes(2);
+  });
+
+  it("transmet le nom du signal (relance)", () => {
+    const fake = fakeChannel();
+    const onEvent = vi.fn();
+    connectLive(fake.channel, { refresh: vi.fn(), onEvent });
+    fake.signal("reminder");
+    expect(onEvent).toHaveBeenCalledWith("reminder");
   });
 
   it("relecture de sécurité lente même abonné", () => {

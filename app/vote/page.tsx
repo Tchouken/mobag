@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VoteForm } from "@/components/voter/vote-form";
 import { formatWeight } from "@/lib/format";
+import { renderRichText } from "@/lib/rich-text/render";
+import type { OpenBallot } from "@/lib/voter/ballot";
 import { createClient } from "@/lib/supabase/server";
 import { LiveRefresh } from "./live-refresh";
 import { ReleaseDevice } from "./release-device";
@@ -24,10 +27,7 @@ export default async function VotePage() {
   const context = data as unknown as VoterContext | null;
   if (!context) redirect("/v");
   const { data: ballotsData } = await supabase.rpc("my_ballots");
-  const ballots = (ballotsData ?? []) as {
-    ballot_id: string;
-    resolution: { number: string; title: string };
-  }[];
+  const ballots = (ballotsData ?? []) as unknown as (OpenBallot & { resolution: { body: unknown } })[];
 
   const own = context.portfolio.members.filter((m) => m.via === "own");
   const proxies = context.portfolio.members.filter((m) => m.via === "proxy");
@@ -39,23 +39,24 @@ export default async function VotePage() {
         <h1 className="text-2xl font-semibold">Bonjour {context.attendee.full_name}</h1>
       </header>
 
-      <div role="status" className="border-border bg-muted rounded-lg border p-6 text-center">
-        {ballots.length > 0 ? (
-          ballots.map((b) => (
-            <p key={b.ballot_id} className="text-xl font-medium">
+      {ballots.length > 0 ? (
+        ballots.map((b) => (
+          <div key={b.ballot_id} className="flex flex-col gap-4">
+            <p role="status" className="bg-muted rounded-lg px-4 py-2 text-base font-medium">
               Vote en cours : résolution {b.resolution.number} — {b.resolution.title}
             </p>
-          ))
-        ) : (
-          <>
-            <p className="text-xl font-medium">Aucun vote en cours</p>
-            <p className="text-muted-foreground mt-2 text-base">
-              Gardez cette page ouverte : la prochaine résolution s&apos;affichera ici dès l&apos;ouverture du
-              vote.
-            </p>
-          </>
-        )}
-      </div>
+            <VoteForm key={b.ballot_id} ballot={b} bodyHtml={renderRichText(b.resolution.body)} />
+          </div>
+        ))
+      ) : (
+        <div role="status" className="border-border bg-muted rounded-lg border p-6 text-center">
+          <p className="text-xl font-medium">Aucun vote en cours</p>
+          <p className="text-muted-foreground mt-2 text-base">
+            Gardez cette page ouverte : la prochaine résolution s&apos;affichera ici dès l&apos;ouverture du
+            vote.
+          </p>
+        </div>
+      )}
 
       <Card>
         <CardHeader>

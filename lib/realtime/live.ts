@@ -8,7 +8,7 @@
 export type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR";
 
 export type LiveChannel = {
-  onSignal: (handler: () => void) => void;
+  onSignal: (handler: (event: string) => void) => void;
   subscribe: (handler: (status: ChannelStatus) => void) => void;
   unsubscribe: () => void;
 };
@@ -16,6 +16,7 @@ export type LiveChannel = {
 export type LiveOptions = {
   refresh: () => void;
   onLiveChange?: (live: boolean) => void;
+  onEvent?: (event: string) => void;
   fallbackMs?: number;
   safetyMs?: number;
   debounceMs?: number;
@@ -26,7 +27,7 @@ export function topicFor(assemblyId: string, audience: "staff" | "voters"): stri
 }
 
 export function connectLive(channel: LiveChannel, options: LiveOptions): () => void {
-  const { refresh, onLiveChange, fallbackMs = 3000, safetyMs = 30000, debounceMs = 250 } = options;
+  const { refresh, onLiveChange, onEvent, fallbackMs = 3000, safetyMs = 30000, debounceMs = 250 } = options;
   let live = false;
   let disposed = false;
   let pending: ReturnType<typeof setTimeout> | undefined;
@@ -58,7 +59,11 @@ export function connectLive(channel: LiveChannel, options: LiveOptions): () => v
     Math.min(fallbackMs, 1000),
   );
 
-  channel.onSignal(schedule);
+  channel.onSignal((event) => {
+    if (disposed) return;
+    onEvent?.(event);
+    schedule();
+  });
   channel.subscribe((status) => {
     if (disposed) return;
     if (status === "SUBSCRIBED") {

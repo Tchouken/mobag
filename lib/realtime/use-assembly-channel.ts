@@ -14,13 +14,16 @@ export function useAssemblyChannel(
   assemblyId: string,
   audience: "staff" | "voters",
   refresh: () => void,
-  trackPresence = false,
+  options: { trackPresence?: boolean; onEvent?: (event: string) => void } = {},
 ): boolean {
+  const trackPresence = Boolean(options.trackPresence);
   const [live, setLive] = useState(false);
   const refreshRef = useRef(refresh);
+  const eventRef = useRef(options.onEvent);
   useEffect(() => {
     refreshRef.current = refresh;
-  }, [refresh]);
+    eventRef.current = options.onEvent;
+  }, [refresh, options.onEvent]);
 
   useEffect(() => {
     const channel = supabase.channel(topicFor(assemblyId, audience), {
@@ -33,7 +36,7 @@ export function useAssemblyChannel(
       if (cancelled) return;
       dispose = connectLive(
         {
-          onSignal: (handler) => channel.on("broadcast", { event: "*" }, handler),
+          onSignal: (handler) => channel.on("broadcast", { event: "*" }, (message) => handler(message.event)),
           subscribe: (handler) =>
             channel.subscribe((status) => {
               if (status === "SUBSCRIBED" && trackPresence) void channel.track({});
@@ -41,7 +44,11 @@ export function useAssemblyChannel(
             }),
           unsubscribe: () => void supabase.removeChannel(channel),
         },
-        { refresh: () => refreshRef.current(), onLiveChange: setLive },
+        {
+          refresh: () => refreshRef.current(),
+          onLiveChange: setLive,
+          onEvent: (event) => eventRef.current?.(event),
+        },
       );
     });
     return () => {
