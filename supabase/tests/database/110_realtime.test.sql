@@ -84,7 +84,7 @@ select ok(pg_temp.signals('staff') like '%devices%', 'émission d''un code signa
 -- ----- Droits de réception -----
 select pg_temp.login('00000000-0000-0000-0000-0000000000a2');
 select ok(pg_temp.visible('staff') > 0, 'le personnel de l''AG reçoit son canal');
-select is(pg_temp.visible('voters'), 0, 'mais pas celui des votants');
+select ok(pg_temp.visible('voters') > 0, 'et celui des votants (signaux et présence des terminaux)');
 reset role;
 select pg_temp.login('00000000-0000-0000-0000-0000000000b1');
 select is(pg_temp.visible('staff'), 0, 'une autre organisation ne reçoit rien');

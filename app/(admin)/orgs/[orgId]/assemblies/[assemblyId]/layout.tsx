@@ -28,6 +28,14 @@ export default async function AssemblyLayout({
               Ouvrir l&apos;accueil
             </Link>
           )}
+          {assembly.status !== "draft" && (
+            <Link
+              href={`/regie/${assembly.id}`}
+              className={buttonVariants({ size: "sm", variant: "outline" })}
+            >
+              Ouvrir la régie
+            </Link>
+          )}
         </div>
         <p className="text-muted-foreground text-sm">
           {ASSEMBLY_TYPE_LABELS[assembly.type]} · {formatAssemblyDate(assembly.starts_at, assembly.timezone)}

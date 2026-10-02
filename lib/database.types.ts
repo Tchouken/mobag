@@ -1445,6 +1445,14 @@ export type Database = {
       };
       attendee_portfolio: { Args: { p_attendee: string }; Returns: Json };
       ballot_progress: { Args: { p_ballot: string }; Returns: Json };
+      bureau_amend_resolution: {
+        Args: { p_data: Json; p_expected_version: number; p_reason: string; p_resolution: string };
+        Returns: string;
+      };
+      bureau_set_member_weight: {
+        Args: { p_member: string; p_reason: string; p_weight: number; p_weight_key: string };
+        Returns: undefined;
+      };
       cancel_ballot: { Args: { p_ballot: string; p_reason: string }; Returns: undefined };
       cast_votes: { Args: { p_ballot: string; p_idempotency_key: string; p_items: Json }; Returns: Json };
       check_in: {
@@ -1535,7 +1543,9 @@ export type Database = {
       open_ballot: { Args: { p_duration_seconds?: number; p_resolution: string }; Returns: Json };
       proxy_overview: { Args: { p_assembly: string }; Returns: Json };
       reception_snapshot: { Args: { p_assembly: string }; Returns: Json };
+      regie_snapshot: { Args: { p_assembly: string }; Returns: Json };
       release_voter_device: { Args: Record<PropertyKey, never>; Returns: undefined };
+      remind_voters: { Args: { p_ballot: string }; Returns: number };
       remove_assembly_staff: {
         Args: { p_assembly: string; p_role: Database["public"]["Enums"]["staff_role"]; p_user: string };
         Returns: undefined;
@@ -1554,6 +1564,7 @@ export type Database = {
         Args: { p_assembly: string; p_reason?: string; p_to: Database["public"]["Enums"]["assembly_status"] };
         Returns: number;
       };
+      set_ballot_timer: { Args: { p_ballot: string; p_seconds: number }; Returns: string };
       set_org_member_role: {
         Args: { p_org: string; p_role: Database["public"]["Enums"]["org_role"]; p_user: string };
         Returns: undefined;

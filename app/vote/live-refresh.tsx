@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/browser";
 export function LiveRefresh({ assemblyId }: { assemblyId: string }) {
   const router = useRouter();
   const [supabase] = useState(createClient);
-  const live = useAssemblyChannel(supabase, assemblyId, "voters", () => router.refresh());
+  const live = useAssemblyChannel(supabase, assemblyId, "voters", () => router.refresh(), true);
   return (
     <p className="text-muted-foreground text-center text-xs" data-testid="live-status">
       {live ? "Connecté" : "Connexion en cours…"}
