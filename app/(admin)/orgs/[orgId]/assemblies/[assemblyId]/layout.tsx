@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AssemblyTabs } from "@/components/assembly/assembly-tabs";
 import { StatusBadge } from "@/components/assembly/status-badge";
 import { Alert } from "@/components/ui/alert";
+import { buttonVariants } from "@/components/ui/button";
 import { ASSEMBLY_TYPE_LABELS, formatAssemblyDate, isEditableStatus } from "@/lib/assembly-labels";
 import { requireAssembly } from "@/lib/auth/assembly";
 
@@ -22,6 +23,11 @@ export default async function AssemblyLayout({
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold">{assembly.title}</h1>
           <StatusBadge status={assembly.status} />
+          {(assembly.status === "convened" || assembly.status === "in_session") && (
+            <Link href={`/accueil/${assembly.id}`} className={buttonVariants({ size: "sm" })}>
+              Ouvrir l&apos;accueil
+            </Link>
+          )}
         </div>
         <p className="text-muted-foreground text-sm">
           {ASSEMBLY_TYPE_LABELS[assembly.type]} · {formatAssemblyDate(assembly.starts_at, assembly.timezone)}

@@ -77,6 +77,9 @@ const MESSAGES: Record<string, string> = {
   grantor_not_found: "Mandant introuvable.",
   missing_holder: "Mandataire non renseigné.",
   invalid_document: "Document invalide.",
+  invalid_token_kind: "Type d'appareil inconnu.",
+  no_active_token: "Aucun appareil de vote n'est associé à cette personne.",
+  invalid_reason: "Motif invalide.",
 };
 
 const FALLBACK = "Une erreur inattendue est survenue. Réessayez ou contactez le support.";
