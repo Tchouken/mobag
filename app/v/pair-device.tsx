@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { QrScanner } from "@/components/voter/qr-scanner";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,20 @@ const MESSAGES: Record<string, string> = {
   token_already_claimed: "Ce code est déjà utilisé sur un autre appareil. Adressez-vous à l'accueil.",
 };
 
+// Une seule session anonyme par appareil, même si deux associations partent en même temps
+// (double effet en développement, double scan) : sinon la seconde session remplace la première
+// et le serveur ne reconnaît plus l'appareil qui a réclamé le code.
+let anonymousSignIn: Promise<boolean> | null = null;
+async function ensureSession(supabase: ReturnType<typeof createClient>): Promise<boolean> {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) return true;
+  anonymousSignIn ??= supabase.auth.signInAnonymously().then(({ error }) => {
+    anonymousSignIn = null;
+    return !error;
+  });
+  return anonymousSignIn;
+}
+
 export function PairDevice() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -28,13 +42,9 @@ export function PairDevice() {
       startTransition(async () => {
         setError(undefined);
         const supabase = createClient();
-        const { data: session } = await supabase.auth.getSession();
-        if (!session.session) {
-          const { error: signInError } = await supabase.auth.signInAnonymously();
-          if (signInError) {
-            setError("Connexion impossible. Vérifiez le réseau et réessayez.");
-            return;
-          }
+        if (!(await ensureSession(supabase))) {
+          setError("Connexion impossible. Vérifiez le réseau et réessayez.");
+          return;
         }
         const { error: claimError } = await supabase.rpc("claim_voter_token", {
           p_code: normalizeCode(code),
@@ -53,7 +63,10 @@ export function PairDevice() {
     [router],
   );
 
+  const linkHandled = useRef(false);
   useEffect(() => {
+    if (linkHandled.current) return;
+    linkHandled.current = true;
     const fromLink = extractCode(`/v${window.location.hash}`);
     if (fromLink) claim(fromLink);
   }, [claim]);
