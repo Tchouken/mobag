@@ -89,7 +89,11 @@ session de l'utilisateur et les RPC.
 ## Déploiement
 
 - **Vercel** (région `cdg1`, `vercel.json`) : une prévisualisation par PR, la production depuis
-  `main`. Les variables ci-dessus sont à déclarer dans le projet Vercel.
+  la branche suivie (Settings → Environments → Production → Branch Tracking). Les variables
+  ci-dessus sont à déclarer dans le projet Vercel ; l'intégration Supabase de Vercel les crée
+  elle-même, mais pour la production uniquement (cocher aussi Preview si besoin). Désactiver
+  « Vercel Authentication » (Deployment Protection), sinon les votants voient une page de
+  connexion Vercel sur les adresses `*.vercel.app`.
 - **Supabase** (région UE) : `npx supabase link --project-ref <ref>` puis `npx supabase db push`
   applique les migrations de `supabase/migrations`. Activer dans le projet : sessions anonymes
   (limite relevée), `pg_cron`, sauvegardes et PITR. URL du site et URL de redirection
