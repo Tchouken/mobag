@@ -47,7 +47,7 @@ Contact : Trang BUI. Suivi commercial : Thibaut (MobilActif).
 | 15  | Langues                       | Français et anglais                                                                                              |
 | 17  | Résultats sur grand écran     | Oui a priori, **à confirmer**                                                                                    |
 
-Questions 7 à 12, 16, 18 et 19 : en attente (voir le courriel ci-dessous).
+Les autres points sont en attente : voir le courriel ci-dessous (numérotation propre au courriel).
 
 ## Courriel préparé pour la FEDE
 
