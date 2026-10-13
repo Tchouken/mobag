@@ -54,11 +54,19 @@ devient la **préproduction** (tests, démonstrations, répétitions).
 | ------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | Base, comptes | Supabase **Pro**, nouveau projet en région **Paris (eu-west-3)**, instance Small, puis Medium ou Large le mois de l'AG | 25 $ + 15 à 60 $ / mois                     |
 | Sauvegardes   | **PITR 7 jours** (restauration à la seconde près) en plus des sauvegardes quotidiennes                                 | ~100 $ / mois                               |
-| Application   | Vercel **Pro** (obligatoire pour un usage commercial), région Paris `cdg1`                                             | 20 $ / utilisateur / mois                   |
+| Application   | Vercel **Pro** (déjà souscrit), région Paris `cdg1`                                                                    | déjà payé                                   |
 | Domaine       | `vote.mobilactif.fr` (HTTPS automatique)                                                                               | inclus                                      |
 | E-mails       | Brevo en SMTP, domaine `mobilactif.fr` authentifié (SPF, DKIM, DMARC)                                                  | gratuit à 300 / jour, ~9 € / mois au-delà   |
 | Supervision   | Sentry (région UE) pour les erreurs, sonde de disponibilité sur `/api/health`                                          | 0 à 26 $ / mois                             |
 | Option        | Supabase **Team** si un client exige un rapport SOC 2, SSO ou des journaux de 28 jours                                 | 599 $ / mois                                |
+
+Pourquoi Supabase et pas Neon (question du 13 octobre 2026) : Neon fournit une excellente base
+Postgres, mais seulement la base. MobAG s'appuie aussi sur les briques intégrées de Supabase :
+comptes et liens de connexion, sessions anonymes des votants, temps réel (régie, votants,
+projection) avec droits en base, stockage des signatures et des exports. Passer à Neon
+obligerait à remplacer ces quatre briques par d'autres services et à réécrire une partie du code
+et des tests, soit plusieurs semaines et un risque inutile avant le 14 avril 2027. Les
+migrations restent du Postgres standard : un changement d'hébergeur reste possible plus tard.
 
 Budget récurrent : **environ 180 à 250 € HT par mois** hors option Team. Il est possible de
 n'augmenter la taille de la base que le mois d'une AG.
